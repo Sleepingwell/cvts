@@ -1,0 +1,143 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Inputs &#8212; cvts 0.0.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/agogo.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Outputs" href="output.html" />
+    <link rel="prev" title="Valhalla Config and Gumpf" href="config.html" /> 
+  </head><body>
+    <div class="header-wrapper" role="banner">
+      <div class="header">
+        <div class="headertitle"><a
+          href="index.html">cvts 0.0.2 documentation</a></div>
+        <div class="rel" role="navigation" aria-label="related navigation">
+          <a href="config.html" title="Valhalla Config and Gumpf"
+             accesskey="P">previous</a> |
+          <a href="output.html" title="Outputs"
+             accesskey="N">next</a> |
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a>
+        </div>
+       </div>
+    </div>
+
+    <div class="content-wrapper">
+      <div class="content">
+        <div class="document">
+            
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="inputs">
+<h1>Inputs<a class="headerlink" href="#inputs" title="Permalink to this headline">¶</a></h1>
+<section id="gps-data">
+<span id="id1"></span><h2>GPS data<a class="headerlink" href="#gps-data" title="Permalink to this headline">¶</a></h2>
+<p>The system expects to find raw data in the directory specified by
+<a class="reference internal" href="cvts.html#cvts.settings.RAW_PATH" title="cvts.settings.RAW_PATH"><code class="xref py py-data docutils literal notranslate"><span class="pre">cvts.settings.RAW_PATH</span></code></a>. The name of each file is <em>&lt;vehicle-id&gt;.csv</em>,
+and the vehicle id is inferred from the file name. So far, we have on file
+per vehicle per day, and the data for each day is contained in a subdirectory.
+All files for a vehicle are concatenated and the GPS points sorted by the time
+stamp. An input CSV looks like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Index</span><span class="p">,</span><span class="n">PlateNumber</span><span class="p">,</span><span class="n">Latitude</span><span class="p">,</span><span class="n">Longitude</span><span class="p">,</span><span class="n">speed</span><span class="p">,</span><span class="n">Orientation</span><span class="p">,</span><span class="n">VehicleType</span><span class="p">,</span><span class="n">Weight</span><span class="p">,</span><span class="n">Time</span>
+<span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mf">108.189498901367</span><span class="p">,</span><span class="mf">11.0894994735718</span><span class="p">,</span><span class="mi">17</span><span class="p">,</span><span class="mi">32</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1501545628</span>
+<span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mf">108.189796447754</span><span class="p">,</span><span class="mf">11.0899000167847</span><span class="p">,</span><span class="mi">9</span><span class="p">,</span><span class="mf">302.5</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1501545658</span>
+<span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mf">108.189796447754</span><span class="p">,</span><span class="mf">11.0899295806885</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mf">95.5</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1501545779</span>
+</pre></div>
+</div>
+</section>
+<section id="geographic-data">
+<span id="geographies-data"></span><h2>Geographic Data<a class="headerlink" href="#geographic-data" title="Permalink to this headline">¶</a></h2>
+<p>The system expects to find shape files for any geographies providing regionalisations
+of interest in the directory <a class="reference internal" href="cvts.html#cvts.settings.BOUNDARIES_PATH" title="cvts.settings.BOUNDARIES_PATH"><code class="xref py py-data docutils literal notranslate"><span class="pre">cvts.settings.BOUNDARIES_PATH</span></code></a>.</p>
+<p>That directory is expected to contain a file named
+<em>geography-geom-field-names.json</em> that contains a (JSON serialized) dictionary
+mapping from the names of the geographies to the fields that contain their
+geometry ids. For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="s2">&quot;District&quot;</span><span class="p">:</span> <span class="s2">&quot;DistrictID&quot;</span><span class="p">,</span> <span class="s2">&quot;trans_cities&quot;</span><span class="p">:</span> <span class="s2">&quot;OBJECTID&quot;</span><span class="p">}</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+        </div>
+        <div class="sidebar">
+          
+          <h3>Table of Contents</h3>
+          <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="cvts.html">cvts package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config.html">Valhalla Config and Gumpf</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Inputs</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#gps-data">GPS data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#geographic-data">Geographic Data</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="output.html">Outputs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scripts.html">Scripts</a></li>
+</ul>
+
+          <div role="search">
+            <h3 style="margin-top: 1.5em;">Search</h3>
+            <form class="search" action="search.html" method="get">
+                <input type="text" name="q" />
+                <input type="submit" value="Go" />
+            </form>
+          </div>
+
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+    <div class="footer-wrapper">
+      <div class="footer">
+        <div class="left">
+          <div role="navigation" aria-label="related navigaton">
+            <a href="config.html" title="Valhalla Config and Gumpf"
+              >previous</a> |
+            <a href="output.html" title="Outputs"
+              >next</a> |
+            <a href="py-modindex.html" title="Python Module Index"
+              >modules</a> |
+            <a href="genindex.html" title="General Index"
+              >index</a>
+          </div>
+          <div role="note" aria-label="source link">
+              <br/>
+              <a href="_sources/input.rst.txt"
+                rel="nofollow">Show Source</a>
+          </div>
+        </div>
+
+        <div class="right">
+          
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2021, Simon Knapp.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.0.2.
+    </div>
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+  </body>
+</html>

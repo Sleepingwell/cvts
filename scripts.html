@@ -1,0 +1,163 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Scripts &#8212; cvts 0.0.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/agogo.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Outputs" href="output.html" /> 
+  </head><body>
+    <div class="header-wrapper" role="banner">
+      <div class="header">
+        <div class="headertitle"><a
+          href="index.html">cvts 0.0.2 documentation</a></div>
+        <div class="rel" role="navigation" aria-label="related navigation">
+          <a href="output.html" title="Outputs"
+             accesskey="P">previous</a> |
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a>
+        </div>
+       </div>
+    </div>
+
+    <div class="content-wrapper">
+      <div class="content">
+        <div class="document">
+            
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="scripts">
+<h1>Scripts<a class="headerlink" href="#scripts" title="Permalink to this headline">¶</a></h1>
+<p>Python scripts used in CVTS. These are installed with the python package.</p>
+<section id="utilities-for-individual-files">
+<h2>Utilities for Individual Files<a class="headerlink" href="#utilities-for-individual-files" title="Permalink to this headline">¶</a></h2>
+<section id="csv2json">
+<h3>csv2json<a class="headerlink" href="#csv2json" title="Permalink to this headline">¶</a></h3>
+<p>Python script for converting CSVs to JSON appropriate for feeding to the
+<a class="reference external" href="https://valhalla.readthedocs.io/en/latest/api/map-matching/api-reference/#outputs-of-trace_attributes">trace_attributes</a> service of Valhalla. This is convenient for converting
+single files when testing/playing/etc.</p>
+</section>
+<section id="json2geojson">
+<h3>json2geojson<a class="headerlink" href="#json2geojson" title="Permalink to this headline">¶</a></h3>
+<p>Python script for converting the json files produced by the <a class="reference external" href="https://valhalla.readthedocs.io/en/latest/api/map-matching/api-reference/#outputs-of-trace_attributes">trace_attributes</a>
+service of Valhalla to GeoJSON files. This is also useful for
+testing/playing/ect.</p>
+</section>
+<section id="anonymizeregos">
+<h3>anonymizeregos<a class="headerlink" href="#anonymizeregos" title="Permalink to this headline">¶</a></h3>
+<p>Script for anonymizing regos in the raw data.</p>
+<p>User will be prompted for salt, which is then added to the rego and hashed
+using sha256. Note that this while this is not recommended for passwords, it
+should be adequate for this case should (I think that if you can access the
+data, then looking at the trace will be a much easier way to determine the rego
+than brute forcing the hash).</p>
+<p><strong>Note that the salt must be kept secret</strong>.</p>
+</section>
+</section>
+<section id="entry-points-for-the-luigi-workflow">
+<h2>Entry Points for the (<a class="reference external" href="https://github.com/spotify/luigi">Luigi</a>) Workflow<a class="headerlink" href="#entry-points-for-the-luigi-workflow" title="Permalink to this headline">¶</a></h2>
+<p>These scripts ensure that various <a class="reference external" href="https://luigi.readthedocs.io/en/stable/tasks.html">tasks</a> are complete.</p>
+<p>The results of these scripts are saved in sub-folders of the</p>
+<section id="processtraces">
+<h3>processtraces<a class="headerlink" href="#processtraces" title="Permalink to this headline">¶</a></h3>
+<p>Script for matching all raw data to the road network.</p>
+</section>
+<section id="regioncounts">
+<h3>regioncounts<a class="headerlink" href="#regioncounts" title="Permalink to this headline">¶</a></h3>
+<p>Script for extracting:</p>
+<ul class="simple">
+<li><p>stops by region,</p></li>
+<li><p>stops on a (0.1 degree) raster, and</p></li>
+<li><p>source and destination counts.</p></li>
+</ul>
+</section>
+<section id="speed">
+<h3>speed<a class="headerlink" href="#speed" title="Permalink to this headline">¶</a></h3>
+<p>Script for calculating speed by road segment by time of day for each vehicle.
+What we would really like, is to have the results of this summarised for all
+vehicles. We have not yet got to doing that, which would be best done with a
+DB, Hadoop or some other thing that would be more suited than straight Python
+code.</p>
+</section>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+        </div>
+        <div class="sidebar">
+          
+          <h3>Table of Contents</h3>
+          <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="cvts.html">cvts package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config.html">Valhalla Config and Gumpf</a></li>
+<li class="toctree-l1"><a class="reference internal" href="input.html">Inputs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="output.html">Outputs</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Scripts</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#utilities-for-individual-files">Utilities for Individual Files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#entry-points-for-the-luigi-workflow">Entry Points for the (Luigi) Workflow</a></li>
+</ul>
+</li>
+</ul>
+
+          <div role="search">
+            <h3 style="margin-top: 1.5em;">Search</h3>
+            <form class="search" action="search.html" method="get">
+                <input type="text" name="q" />
+                <input type="submit" value="Go" />
+            </form>
+          </div>
+
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+    <div class="footer-wrapper">
+      <div class="footer">
+        <div class="left">
+          <div role="navigation" aria-label="related navigaton">
+            <a href="output.html" title="Outputs"
+              >previous</a> |
+            <a href="py-modindex.html" title="Python Module Index"
+              >modules</a> |
+            <a href="genindex.html" title="General Index"
+              >index</a>
+          </div>
+          <div role="note" aria-label="source link">
+              <br/>
+              <a href="_sources/scripts.rst.txt"
+                rel="nofollow">Show Source</a>
+          </div>
+        </div>
+
+        <div class="right">
+          
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2021, Simon Knapp.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.0.2.
+    </div>
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+  </body>
+</html>

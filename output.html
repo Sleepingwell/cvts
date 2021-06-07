@@ -1,0 +1,235 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Outputs &#8212; cvts 0.0.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/agogo.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Scripts" href="scripts.html" />
+    <link rel="prev" title="Inputs" href="input.html" /> 
+  </head><body>
+    <div class="header-wrapper" role="banner">
+      <div class="header">
+        <div class="headertitle"><a
+          href="index.html">cvts 0.0.2 documentation</a></div>
+        <div class="rel" role="navigation" aria-label="related navigation">
+          <a href="input.html" title="Inputs"
+             accesskey="P">previous</a> |
+          <a href="scripts.html" title="Scripts"
+             accesskey="N">next</a> |
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a>
+        </div>
+       </div>
+    </div>
+
+    <div class="content-wrapper">
+      <div class="content">
+        <div class="document">
+            
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="outputs">
+<h1>Outputs<a class="headerlink" href="#outputs" title="Permalink to this headline">¶</a></h1>
+<p>Outputs are created under the directory specified by <code class="xref py py-data docutils literal notranslate"><span class="pre">cvts.settings.OUT_DIR</span></code>.</p>
+<section id="map-matching-outputs">
+<span id="map-matching-output"></span><h2>Map Matching Outputs<a class="headerlink" href="#map-matching-outputs" title="Permalink to this headline">¶</a></h2>
+<p>Directory specified by <a class="reference internal" href="cvts.html#cvts.settings.MM_PATH" title="cvts.settings.MM_PATH"><code class="xref py py-data docutils literal notranslate"><span class="pre">cvts.settings.MM_PATH</span></code></a>.</p>
+<p>Contains a CSV for each vehicle. An example of the contents of each CSV is:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">lat</span><span class="p">,</span><span class="n">lon</span><span class="p">,</span><span class="n">time</span><span class="p">,</span><span class="n">heading</span><span class="p">,</span><span class="n">speed</span><span class="p">,</span><span class="n">heading_tolerance</span><span class="p">,</span><span class="n">status</span><span class="p">,</span><span class="n">trip_index</span><span class="p">,</span><span class="n">way_id</span><span class="p">,</span><span class="n">valhalla_speed</span><span class="p">,</span><span class="n">speed_limit</span><span class="p">,</span><span class="n">message</span>
+<span class="mf">10.862250328064</span><span class="p">,</span><span class="mf">106.928115844727</span><span class="p">,</span><span class="mf">1501545600.0</span><span class="p">,</span><span class="mf">180.0</span><span class="p">,</span><span class="mf">0.0</span><span class="p">,</span><span class="mi">45</span><span class="p">,</span><span class="n">success</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">829395784</span><span class="p">,</span><span class="mi">20</span><span class="p">,</span><span class="n">NA</span><span class="p">,</span><span class="n">matched</span>
+<span class="mf">10.8622531890869</span><span class="p">,</span><span class="mf">106.928123474121</span><span class="p">,</span><span class="mf">1501545727.0</span><span class="p">,</span><span class="mf">180.0</span><span class="p">,</span><span class="mf">0.0</span><span class="p">,</span><span class="mi">45</span><span class="p">,</span><span class="n">success</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">829395784</span><span class="p">,</span><span class="mi">20</span><span class="p">,</span><span class="n">NA</span><span class="p">,</span><span class="n">interpolated</span>
+<span class="mf">10.8622550964355</span><span class="p">,</span><span class="mf">106.928123474121</span><span class="p">,</span><span class="mf">1501546327.0</span><span class="p">,</span><span class="mf">180.0</span><span class="p">,</span><span class="mf">0.0</span><span class="p">,</span><span class="mi">45</span><span class="p">,</span><span class="n">success</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">829395784</span><span class="p">,</span><span class="mi">20</span><span class="p">,</span><span class="n">NA</span><span class="p">,</span><span class="n">interpolated</span>
+<span class="o">...</span>
+</pre></div>
+</div>
+<p>Each row corresponds to an input point, and all input points are included.
+<strong>Note that the order of the points may not correspond to the order of points
+in the input files.</strong></p>
+<p>The fields are:</p>
+<ul class="simple">
+<li><p><em>lat</em>: Latitude of the point (from the GPS trace).</p></li>
+<li><p><em>lon</em>: Longitude of the point (from the GPS trace).</p></li>
+<li><p><em>time</em>: Timestamp of the point (from the GPS trace).</p></li>
+<li><p><em>speed</em>: Speed at the point (from the GPS trace).</p></li>
+<li><p><em>heading</em>: Heading at the point (from the GPS trace).</p></li>
+<li><p><em>heading_tolerance</em>: Heading tolerance specified for the point. This is
+specified by our software and used internally by Valhalla for calculating
+costs when doing the matching.</p></li>
+<li><p><em>status</em>: One of “success” or “failure”, denoting whether matching succeeded
+or failed for the point.</p></li>
+<li><p><em>trip_index</em>: Index of the trip, which is just a counter (starting at zero)
+which is indexed for every trip (produced by our code).</p></li>
+<li><p><em>way_id</em>: Identifier of the way Valhalla matched the point to.</p></li>
+<li><p><em>valhalla_speed</em>: Speed reported by Valhalla.</p></li>
+<li><p><em>speed_limit</em>: Speed limit on the way reported by Valhalla.</p></li>
+<li><p><em>message</em>: Either the match type returned by Valhalla, or an error message
+(the result of <cite>str(e)</cite>, where <cite>e</cite> is the exception thrown in the case where
+<em>status</em> is “failure”.</p></li>
+</ul>
+</section>
+<section id="trips">
+<span id="trip-output"></span><h2>Trips<a class="headerlink" href="#trips" title="Permalink to this headline">¶</a></h2>
+<p>Directory specified by <a class="reference internal" href="cvts.html#cvts.settings.SEQ_PATH" title="cvts.settings.SEQ_PATH"><code class="xref py py-data docutils literal notranslate"><span class="pre">cvts.settings.SEQ_PATH</span></code></a>.</p>
+<p>JSON data for each vehicle. The JSON data contains a list of dicts, one for
+each trip. Each dict contains:</p>
+<ul>
+<li><p><em>STatus</em>: “success” if Valhalla succeeded for this trip or “failure” if
+it did not.</p></li>
+<li><p><em>trip_index</em>: Index of the trip.</p></li>
+<li><p><em>start</em>:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><em>time</em>: Timestamp of the point at which the trip started.</p></li>
+<li><dl class="simple">
+<dt><em>loc</em>:</dt><dd><ul>
+<li><p><em>lat</em>: Latitude of the point at which the trip started.</p></li>
+<li><p><em>lon</em>: Longitude of the point at which the trip started.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><em>way_ids</em>: List of way ids of the trip as produced by Valhalla. Only
+present if <em>status</em> is “success”</p></li>
+<li><p><em>geojson</em>: A GeoJSON representation of the trip (produced by
+<em>cvts.json2geojson</em>). Only present if <em>status</em> is “success”</p></li>
+<li><p><em>message</em>: An error message. The result of <cite>str(e)</cite>, where <cite>e</cite> is the
+exception thrown in the case where <em>status</em> is “failure”. Only present
+when <em>status</em> is “failure”.</p></li>
+</ul>
+</section>
+<section id="average-speeds">
+<span id="speed-output"></span><h2>Average Speeds<a class="headerlink" href="#average-speeds" title="Permalink to this headline">¶</a></h2>
+<p>Directory specified by <a class="reference internal" href="cvts.html#cvts.settings.SPEED_PATH" title="cvts.settings.SPEED_PATH"><code class="xref py py-data docutils literal notranslate"><span class="pre">cvts.settings.SPEED_PATH</span></code></a>.</p>
+<p>For each vehicle, there are two files:</p>
+<ul>
+<li><p><strong>&lt;vehicle-id&gt;-moving.csv</strong>: Contains the proportion of observations
+where the vehicle with id <em>vehicle-id</em> is considered to be moving by hour,
+weekday and way ID (<em>propMoving</em>). Example content:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">way_id</span><span class="p">,</span><span class="n">hour</span><span class="p">,</span><span class="n">weekDay</span><span class="p">,</span><span class="n">propMoving</span><span class="p">,</span><span class="n">rego</span>
+<span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mf">0.07692307692307693</span><span class="p">,</span><span class="mi">11</span><span class="n">C00211</span>
+<span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mf">0.0</span><span class="p">,</span><span class="mi">11</span><span class="n">C00211</span>
+<span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mf">0.04938271604938271</span><span class="p">,</span><span class="mi">11</span><span class="n">C00211</span>
+<span class="o">...</span>
+</pre></div>
+</div>
+</li>
+<li><p><strong>&lt;vehicle-id&gt;-speed.csv</strong>: Contains the average speed of the vehicle
+with id <em>vehicle-id</em> over all observations where the vehicle is is
+considered to be moving by hour, weekday and way ID (<em>speed</em>). Each observation
+includes a weight describing the number of observations included in the
+average. Example content:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">way_id</span><span class="p">,</span><span class="n">hour</span><span class="p">,</span><span class="n">weekDay</span><span class="p">,</span><span class="n">speed</span><span class="p">,</span><span class="n">weight</span><span class="p">,</span><span class="n">rego</span>
+<span class="mi">135742765</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mf">22.8</span><span class="p">,</span><span class="mf">15.0</span><span class="p">,</span><span class="mi">11</span><span class="n">C00211</span>
+<span class="mi">135742765</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mf">23.0</span><span class="p">,</span><span class="mf">12.0</span><span class="p">,</span><span class="mi">11</span><span class="n">C00211</span>
+<span class="mi">135742765</span><span class="p">,</span><span class="mi">11</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mf">27.88888888888889</span><span class="p">,</span><span class="mf">18.0</span><span class="p">,</span><span class="mi">11</span><span class="n">C00211</span>
+<span class="o">...</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="source-destination">
+<span id="stop-dest-output"></span><h2>Source Destination<a class="headerlink" href="#source-destination" title="Permalink to this headline">¶</a></h2>
+<p>Directory specified by <a class="reference internal" href="cvts.html#cvts.settings.SRC_DEST_PATH" title="cvts.settings.SRC_DEST_PATH"><code class="xref py py-data docutils literal notranslate"><span class="pre">cvts.settings.SRC_DEST_PATH</span></code></a>.</p>
+<p>Source/destination lon/lats. Each (JSON) file contains a list
+of lists. Each of which is the lon/lat of a stop point corresponding to
+either a trips start point, or the trips end point. The even numbered rows
+correspond to source points, and the odd numbered rows correspond to
+destination points</p>
+</section>
+<section id="stops">
+<span id="stop-points-output"></span><h2>Stops<a class="headerlink" href="#stops" title="Permalink to this headline">¶</a></h2>
+<p>Directory specified by <a class="reference internal" href="cvts.html#cvts.settings.STOP_PATH" title="cvts.settings.STOP_PATH"><code class="xref py py-data docutils literal notranslate"><span class="pre">cvts.settings.STOP_PATH</span></code></a>.</p>
+<p>Stop points lon/lats. Each (JSON) file contains a list of lists.
+Each of which is a stop point.</p>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+        </div>
+        <div class="sidebar">
+          
+          <h3>Table of Contents</h3>
+          <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="cvts.html">cvts package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config.html">Valhalla Config and Gumpf</a></li>
+<li class="toctree-l1"><a class="reference internal" href="input.html">Inputs</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Outputs</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#map-matching-outputs">Map Matching Outputs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#trips">Trips</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#average-speeds">Average Speeds</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#source-destination">Source Destination</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#stops">Stops</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="scripts.html">Scripts</a></li>
+</ul>
+
+          <div role="search">
+            <h3 style="margin-top: 1.5em;">Search</h3>
+            <form class="search" action="search.html" method="get">
+                <input type="text" name="q" />
+                <input type="submit" value="Go" />
+            </form>
+          </div>
+
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+    <div class="footer-wrapper">
+      <div class="footer">
+        <div class="left">
+          <div role="navigation" aria-label="related navigaton">
+            <a href="input.html" title="Inputs"
+              >previous</a> |
+            <a href="scripts.html" title="Scripts"
+              >next</a> |
+            <a href="py-modindex.html" title="Python Module Index"
+              >modules</a> |
+            <a href="genindex.html" title="General Index"
+              >index</a>
+          </div>
+          <div role="note" aria-label="source link">
+              <br/>
+              <a href="_sources/output.rst.txt"
+                rel="nofollow">Show Source</a>
+          </div>
+        </div>
+
+        <div class="right">
+          
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2021, Simon Knapp.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.0.2.
+    </div>
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+  </body>
+</html>

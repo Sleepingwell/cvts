@@ -1,0 +1,389 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>cvts package &#8212; cvts 0.0.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/agogo.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="cvts.tasks package" href="cvts.tasks.html" />
+    <link rel="prev" title="YDYR’s Developer Documentation" href="index.html" /> 
+  </head><body>
+    <div class="header-wrapper" role="banner">
+      <div class="header">
+        <div class="headertitle"><a
+          href="index.html">cvts 0.0.2 documentation</a></div>
+        <div class="rel" role="navigation" aria-label="related navigation">
+          <a href="index.html" title="YDYR’s Developer Documentation"
+             accesskey="P">previous</a> |
+          <a href="cvts.tasks.html" title="cvts.tasks package"
+             accesskey="N">next</a> |
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a>
+        </div>
+       </div>
+    </div>
+
+    <div class="content-wrapper">
+      <div class="content">
+        <div class="document">
+            
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="cvts-package">
+<h1>cvts package<a class="headerlink" href="#cvts-package" title="Permalink to this headline">¶</a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="cvts.tasks.html">cvts.tasks package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cvts.tasks.html#module-cvts.tasks">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="module-cvts.settings">
+<span id="cvts-settings-module"></span><h2>cvts.settings module<a class="headerlink" href="#module-cvts.settings" title="Permalink to this headline">¶</a></h2>
+<dl class="py data">
+<dt class="sig sig-object py" id="cvts.settings.ANON_RAW_PATH">
+<span class="sig-prename descclassname"><span class="pre">cvts.settings.</span></span><span class="sig-name descname"><span class="pre">ANON_RAW_PATH</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'~/.cvts/anon_raw'</span></em><a class="headerlink" href="#cvts.settings.ANON_RAW_PATH" title="Permalink to this definition">¶</a></dt>
+<dd><p>Root directory for anonymized <a class="reference internal" href="input.html"><span class="doc">input files</span></a>. These are generated
+by the script</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="cvts.settings.BOUNDARIES_PATH">
+<span class="sig-prename descclassname"><span class="pre">cvts.settings.</span></span><span class="sig-name descname"><span class="pre">BOUNDARIES_PATH</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'~/.cvts/boundaries'</span></em><a class="headerlink" href="#cvts.settings.BOUNDARIES_PATH" title="Permalink to this definition">¶</a></dt>
+<dd><p>Directory for shape files for <a class="reference internal" href="index.html#term-geography"><span class="xref std std-term">geographies</span></a>.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="cvts.settings.CONFIG_PATH">
+<span class="sig-prename descclassname"><span class="pre">cvts.settings.</span></span><span class="sig-name descname"><span class="pre">CONFIG_PATH</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'~/.cvts/config'</span></em><a class="headerlink" href="#cvts.settings.CONFIG_PATH" title="Permalink to this definition">¶</a></dt>
+<dd><p>Directory containing <a class="reference internal" href="#cvts.settings.VALHALLA_CONFIG_FILE" title="cvts.settings.VALHALLA_CONFIG_FILE"><code class="xref py py-data docutils literal notranslate"><span class="pre">VALHALLA_CONFIG_FILE</span></code></a></p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="cvts.settings.DEBUG">
+<span class="sig-prename descclassname"><span class="pre">cvts.settings.</span></span><span class="sig-name descname"><span class="pre">DEBUG</span></span><em class="property"> <span class="pre">=</span> <span class="pre">False</span></em><a class="headerlink" href="#cvts.settings.DEBUG" title="Permalink to this definition">¶</a></dt>
+<dd><p>Are we debugging. Can be set via the environment variable <em>CVTS_DEBUG</em>.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="cvts.settings.EARTH_RADIUS">
+<span class="sig-prename descclassname"><span class="pre">cvts.settings.</span></span><span class="sig-name descname"><span class="pre">EARTH_RADIUS</span></span><em class="property"> <span class="pre">=</span> <span class="pre">6371000</span></em><a class="headerlink" href="#cvts.settings.EARTH_RADIUS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Radius of the Earth in meters.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="cvts.settings.MIN_MOVE_DISTANCE">
+<span class="sig-prename descclassname"><span class="pre">cvts.settings.</span></span><span class="sig-name descname"><span class="pre">MIN_MOVE_DISTANCE</span></span><em class="property"> <span class="pre">=</span> <span class="pre">50</span></em><a class="headerlink" href="#cvts.settings.MIN_MOVE_DISTANCE" title="Permalink to this definition">¶</a></dt>
+<dd><p>The minimum distance a vehicle can move between two (potentially non-adjacent)
+GPS points to not be considered ‘moving’ in meters.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="cvts.settings.MIN_MOVING_SPEED">
+<span class="sig-prename descclassname"><span class="pre">cvts.settings.</span></span><span class="sig-name descname"><span class="pre">MIN_MOVING_SPEED</span></span><em class="property"> <span class="pre">=</span> <span class="pre">6</span></em><a class="headerlink" href="#cvts.settings.MIN_MOVING_SPEED" title="Permalink to this definition">¶</a></dt>
+<dd><p>The minimum speed a vehicle can be moving to be considered ‘moving’ in
+kilometers per hour.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="cvts.settings.MIN_STOP_TIME">
+<span class="sig-prename descclassname"><span class="pre">cvts.settings.</span></span><span class="sig-name descname"><span class="pre">MIN_STOP_TIME</span></span><em class="property"> <span class="pre">=</span> <span class="pre">1200</span></em><a class="headerlink" href="#cvts.settings.MIN_STOP_TIME" title="Permalink to this definition">¶</a></dt>
+<dd><p>The minimum time a vehicle must not move for to be considered ‘stopped’ in
+seconds.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="cvts.settings.MM_PATH">
+<span class="sig-prename descclassname"><span class="pre">cvts.settings.</span></span><span class="sig-name descname"><span class="pre">MM_PATH</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'~/.cvts/output/mm'</span></em><a class="headerlink" href="#cvts.settings.MM_PATH" title="Permalink to this definition">¶</a></dt>
+<dd><p>Output directory for <a class="reference internal" href="output.html#map-matching-output"><span class="std std-ref">map matching outputs</span></a>.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="cvts.settings.OUT_PATH">
+<span class="sig-prename descclassname"><span class="pre">cvts.settings.</span></span><span class="sig-name descname"><span class="pre">OUT_PATH</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'~/.cvts/output'</span></em><a class="headerlink" href="#cvts.settings.OUT_PATH" title="Permalink to this definition">¶</a></dt>
+<dd><p>Root directory for outputs.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="cvts.settings.RAW_PATH">
+<span class="sig-prename descclassname"><span class="pre">cvts.settings.</span></span><span class="sig-name descname"><span class="pre">RAW_PATH</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'~/.cvts/raw'</span></em><a class="headerlink" href="#cvts.settings.RAW_PATH" title="Permalink to this definition">¶</a></dt>
+<dd><p>Root directory for <a class="reference internal" href="input.html"><span class="doc">input files</span></a>.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="cvts.settings.SEQ_PATH">
+<span class="sig-prename descclassname"><span class="pre">cvts.settings.</span></span><span class="sig-name descname"><span class="pre">SEQ_PATH</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'~/.cvts/output/seq'</span></em><a class="headerlink" href="#cvts.settings.SEQ_PATH" title="Permalink to this definition">¶</a></dt>
+<dd><p>Output directory for <a class="reference internal" href="output.html#trip-output"><span class="std std-ref">trip outputs</span></a>.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="cvts.settings.SPEED_PATH">
+<span class="sig-prename descclassname"><span class="pre">cvts.settings.</span></span><span class="sig-name descname"><span class="pre">SPEED_PATH</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'~/.cvts/output/speed'</span></em><a class="headerlink" href="#cvts.settings.SPEED_PATH" title="Permalink to this definition">¶</a></dt>
+<dd><p>Output directory for <a class="reference internal" href="output.html#speed-output"><span class="std std-ref">speed outputs</span></a>.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="cvts.settings.SRC_DEST_PATH">
+<span class="sig-prename descclassname"><span class="pre">cvts.settings.</span></span><span class="sig-name descname"><span class="pre">SRC_DEST_PATH</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'~/.cvts/output/src_dest'</span></em><a class="headerlink" href="#cvts.settings.SRC_DEST_PATH" title="Permalink to this definition">¶</a></dt>
+<dd><p>Output directory for <a class="reference internal" href="output.html#stop-dest-output"><span class="std std-ref">source/destination outputs</span></a>.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="cvts.settings.STOP_PATH">
+<span class="sig-prename descclassname"><span class="pre">cvts.settings.</span></span><span class="sig-name descname"><span class="pre">STOP_PATH</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'~/.cvts/output/stop'</span></em><a class="headerlink" href="#cvts.settings.STOP_PATH" title="Permalink to this definition">¶</a></dt>
+<dd><p>Output directory for <a class="reference internal" href="output.html#stop-points-output"><span class="std std-ref">stop points</span></a>.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="cvts.settings.VALHALLA_CONFIG_FILE">
+<span class="sig-prename descclassname"><span class="pre">cvts.settings.</span></span><span class="sig-name descname"><span class="pre">VALHALLA_CONFIG_FILE</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'~/.cvts/config/valhalla.json'</span></em><a class="headerlink" href="#cvts.settings.VALHALLA_CONFIG_FILE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Path to Valhalla configuration file.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="cvts.settings.WORK_PATH">
+<span class="sig-prename descclassname"><span class="pre">cvts.settings.</span></span><span class="sig-name descname"><span class="pre">WORK_PATH</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'~/.cvts'</span></em><a class="headerlink" href="#cvts.settings.WORK_PATH" title="Permalink to this definition">¶</a></dt>
+<dd><p>Default root directory</p>
+</dd></dl>
+
+</section>
+<section id="module-cvts">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-cvts" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="cvts.distance">
+<span class="sig-prename descclassname"><span class="pre">cvts.</span></span><span class="sig-name descname"><span class="pre">distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cvts.distance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Quick and adequate distance calculation for for small distances in meters
+between two lon/lats.</p>
+<p>This should be adequate for the purpose of measuring points between points
+in the kinds of GPS traces we are working with, where the typical sampling
+interval is around 15 seconds (i.e., differences in latitude between <em>y0</em>
+and <em>y1</em> are (very) small).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x0</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – First longitude.</p></li>
+<li><p><strong>y0</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – First latitude.</p></li>
+<li><p><strong>x1</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – Second longitude.</p></li>
+<li><p><strong>y1</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – Second latitude.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Approximate distance between the two points in meters.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cvts.json2geojson">
+<span class="sig-prename descclassname"><span class="pre">cvts.</span></span><span class="sig-name descname"><span class="pre">json2geojson</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cvts.json2geojson" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert the output from Valhalla to a GeoJSON object.</p>
+<p>On the command line, the call would look like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">valhalla_service</span> <span class="o">&lt;</span><span class="n">config</span><span class="o">-</span><span class="n">file</span><span class="o">&gt;</span> <span class="n">trace_attributes</span> <span class="o">&lt;</span><span class="nb">input</span><span class="o">-</span><span class="n">file</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]) – Output of a call to Valhalla (as described above).</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>TODO</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cvts.jsonfile2geojsonfile">
+<span class="sig-prename descclassname"><span class="pre">cvts.</span></span><span class="sig-name descname"><span class="pre">jsonfile2geojsonfile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">infile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outfile</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cvts.jsonfile2geojsonfile" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cvts.points_to_polys">
+<span class="sig-prename descclassname"><span class="pre">cvts.</span></span><span class="sig-name descname"><span class="pre">points_to_polys</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">points</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shapedata</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cvts.points_to_polys" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate which geometry each point in <em>points</em> lie within.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>points</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">NDArray</span></code>) – Two column numpy array containing the longitudes and
+latitudes of the address points.</p></li>
+<li><p><strong>shapedata</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – tuple containing geometry IDs, polygions and bounding boxes
+for a geography.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">NDArray</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The geometry ID for each point.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cvts.rawfiles2jsonchunks">
+<span class="sig-prename descclassname"><span class="pre">cvts.</span></span><span class="sig-name descname"><span class="pre">rawfiles2jsonchunks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">csv_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split_trips</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cvts.rawfiles2jsonchunks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a generator over all the data for a single vehicle from data in a
+csv or iterable of csvs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>csv_file</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Iterable" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]]) – Either the name of a
+<a class="reference internal" href="input.html#gps-data"><span class="std std-ref">GPS data</span></a> file or an iterable of names of such files.</p></li>
+<li><p><strong>split_trips</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – if <cite>True</cite>, then split into <a class="reference internal" href="index.html#term-trip"><span class="xref std std-term">trips</span></a>,
+otherwise return all points as a single ‘trip’.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Generator" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Generator</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>], <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><p>A geenerator over a dicts that contain information about each GPS
+point. Each dict looks like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s1">&#39;lat&#39;</span><span class="p">:</span>     <span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;Longitude&#39;</span><span class="p">]),</span>
+    <span class="s1">&#39;lon&#39;</span><span class="p">:</span>     <span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;Latitude&#39;</span><span class="p">]),</span>
+    <span class="s1">&#39;time&#39;</span><span class="p">:</span>    <span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;Time&#39;</span><span class="p">]),</span>
+    <span class="s1">&#39;heading&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;Orientation&#39;</span><span class="p">]),</span>
+    <span class="s1">&#39;speed&#39;</span><span class="p">:</span>   <span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;speed&#39;</span><span class="p">]),</span>
+    <span class="s1">&#39;heading_tolerance&#39;</span><span class="p">:</span> <span class="mi">45</span><span class="p">,</span>
+    <span class="s1">&#39;type&#39;</span><span class="p">:</span>    <span class="s1">&#39;via&#39;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cvts.rawfiles2jsonfile">
+<span class="sig-prename descclassname"><span class="pre">cvts.</span></span><span class="sig-name descname"><span class="pre">rawfiles2jsonfile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">csv_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_file</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cvts.rawfiles2jsonfile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Call <a class="reference internal" href="#cvts.rawfiles2jsonchunks" title="cvts.rawfiles2jsonchunks"><code class="xref py py-func docutils literal notranslate"><span class="pre">rawfiles2jsonchunks()</span></code></a>, passing <em>csv_files</em> and <em>False</em>, and
+write the result to <em>out_file</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>csv_file</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Iterable" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]]) – Either the name of a
+<a class="reference internal" href="input.html#gps-data"><span class="std std-ref">GPS data</span></a> file or an iterable of names of such files.</p></li>
+<li><p><strong>out_file</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – The path of the file to write the trip to.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cvts.read_shapefile">
+<span class="sig-prename descclassname"><span class="pre">cvts.</span></span><span class="sig-name descname"><span class="pre">read_shapefile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geometry_id_field</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cvts.read_shapefile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load the data from a shapefile.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – The name of the shapefile.</p></li>
+<li><p><strong>geometry_id_field</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – The field to extract from the shapefile. This
+should contain the identifier for the geometries.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The name of the file the data in the shapefile was saved to.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+        </div>
+        <div class="sidebar">
+          
+          <h3>Table of Contents</h3>
+          <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">cvts package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#subpackages">Subpackages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-cvts.settings">cvts.settings module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-cvts">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="config.html">Valhalla Config and Gumpf</a></li>
+<li class="toctree-l1"><a class="reference internal" href="input.html">Inputs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="output.html">Outputs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scripts.html">Scripts</a></li>
+</ul>
+
+          <div role="search">
+            <h3 style="margin-top: 1.5em;">Search</h3>
+            <form class="search" action="search.html" method="get">
+                <input type="text" name="q" />
+                <input type="submit" value="Go" />
+            </form>
+          </div>
+
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+    <div class="footer-wrapper">
+      <div class="footer">
+        <div class="left">
+          <div role="navigation" aria-label="related navigaton">
+            <a href="index.html" title="YDYR’s Developer Documentation"
+              >previous</a> |
+            <a href="cvts.tasks.html" title="cvts.tasks package"
+              >next</a> |
+            <a href="py-modindex.html" title="Python Module Index"
+              >modules</a> |
+            <a href="genindex.html" title="General Index"
+              >index</a>
+          </div>
+          <div role="note" aria-label="source link">
+              <br/>
+              <a href="_sources/cvts.rst.txt"
+                rel="nofollow">Show Source</a>
+          </div>
+        </div>
+
+        <div class="right">
+          
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2021, Simon Knapp.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.0.2.
+    </div>
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+  </body>
+</html>
