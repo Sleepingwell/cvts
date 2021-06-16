@@ -23,6 +23,7 @@ wget https://download.geofabrik.de/asia/vietnam-latest.osm.pbf
 mkdir -p valhalla_tiles
 valhalla_build_config \
     --service-limits-trace-max-distance 10000000 \
+    --service-limits-trace-max-shape 1000000 \
     --mjolnir-tile-dir ${PWD}/valhalla_tiles \
     --mjolnir-tile-extract ${PWD}/valhalla_tiles.tar \
     --mjolnir-timezone ${PWD}/valhalla_tiles/timezones.sqlite \
