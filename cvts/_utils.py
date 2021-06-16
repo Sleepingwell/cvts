@@ -93,12 +93,12 @@ def _prepjson(locs, split_trips):
     locs.sort(key=lambda l: l['time'])
     if split_trips:
         for split in _trip_slices(locs):
-            locs = locs[split]
-            if len(locs) == 0:
+            clocs = locs[split]
+            if len(clocs) == 0:
                 continue
-            locs[0]['type'] = 'break'
-            locs[-1]['type'] = 'break'
-            yield {'shape': locs, 'costing': 'auto', 'shape_match': 'map_snap'}
+            clocs[0]['type'] = 'break'
+            clocs[-1]['type'] = 'break'
+            yield {'shape': clocs, 'costing': 'auto', 'shape_match': 'map_snap'}
     else:
         locs[0]['type'] = 'break'
         locs[-1]['type'] = 'break'
