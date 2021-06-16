@@ -44,13 +44,12 @@ def _trip_slices(locs):
     else:
         getter = lambda l: (l['time'], l['speed'], l['lat'], l['lon'])
         zi = enumerate(getter(l) for l in locs)
-        has_moved = False
         li, (last_moved_time, _, ly, lx) = next(zi)
         last_point_time = last_moved_time
         i = li
 
         for i, (t, s, y, x) in zi:
-            has_moved = has_moved or s > MIN_MOVING_SPEED or distance(lx, ly, x, y) > MIN_MOVE_DISTANCE
+            has_moved = s > MIN_MOVING_SPEED or distance(lx, ly, x, y) > MIN_MOVE_DISTANCE
 
             if has_moved:
                 if t - last_moved_time > MIN_STOP_TIME:
@@ -60,11 +59,11 @@ def _trip_slices(locs):
                     else:
                         yield slice(li, i)
                         li = i
-                    has_moved = False
                 lx, ly, last_moved_time = x, y, t
 
             last_point_time = t
 
+        # TODO: Should we be doing this only when vehicle has moved?
         yield slice(li, i+1)
 
 
