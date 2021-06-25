@@ -1,8 +1,11 @@
 .PHONY: initial-setup venv sphinx-doc clean clean-build clean-sphinx-doc
 
-initial-setup: clean venv sphinx-doc
+initial-setup: setup-valhalla venv sphinx-doc
 
-venv:
+setup-valhalla:
+	./setup-valhalla.sh
+
+venv: clean
 	virtualenv -p python3 venv
 	. ./venv/bin/activate && pip install -e .[dev]
 

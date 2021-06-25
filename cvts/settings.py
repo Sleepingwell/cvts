@@ -3,6 +3,8 @@ import os
 DEBUG = False
 
 _building = bool(os.environ.get('BUILDING_CVTS_DOC', False))
+_initial_setup_and_test = bool(os.environ.get('CVTS_INITIAL_SETUP_AND_TEST', False))
+
 if _building:
     # Sphinx puts the path in the documentation... so make it the default.
     # if we don't do it here, it gets expanded when setting WORK_PATH below.
@@ -44,7 +46,11 @@ WORK_PATH       = os.environ.get(
     'CVTS_WORK_PATH', os.path.join(os.path.expanduser("~"), '.cvts'))
 
 #: Root directory for :doc:`input files<input>`.
-RAW_PATH        = _get_path('raw', not _building)
+RAW_PATH        = _get_path('raw', not (_building or _initial_setup_and_test))
+
+#: Root directory for anonymized :doc:`input files<input>`. These are generated
+#: by the script
+ANON_RAW_PATH   = _get_path('anon_raw')
 
 #: Directory for shape files for :term:`geographies<geography>`.
 BOUNDARIES_PATH = _get_path('boundaries')
@@ -74,7 +80,7 @@ SPEED_PATH      = os.path.join(OUT_PATH, 'speed')
 VALHALLA_CONFIG_FILE = os.path.join(CONFIG_PATH, 'valhalla.json')
 
 if not _building:
-    for p in (CONFIG_PATH, OUT_PATH, SEQ_PATH, MM_PATH, STOP_PATH, SRC_DEST_PATH, SPEED_PATH):
+    for p in (ANON_RAW_PATH, CONFIG_PATH, OUT_PATH, SEQ_PATH, MM_PATH, STOP_PATH, SRC_DEST_PATH, SPEED_PATH):
         if not os.path.exists(p):
             os.makedirs(p)
 
@@ -83,6 +89,7 @@ if __name__ == '__main__':
     print(';'.join('export CVTS_{}={}'.format(v, eval(v)) for v in (
         'WORK_PATH',
         'RAW_PATH',
+        'ANON_RAW_PATH',
         'BOUNDARIES_PATH',
         'CONFIG_PATH',
         'OUT_PATH',

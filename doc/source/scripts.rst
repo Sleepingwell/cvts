@@ -24,6 +24,19 @@ Python script for converting the json files produced by the `trace_attributes`_
 service of Valhalla to GeoJSON files. This is also useful for
 testing/playing/ect.
 
+anonymizeregos
+--------------
+
+Script for anonymizing regos in the raw data.
+
+User will be prompted for salt, which is then added to the rego and hashed
+using sha256. Note that this while this is not recommended for passwords, it
+should be adequate for this case should (I think that if you can access the
+data, then looking at the trace will be a much easier way to determine the rego
+than brute forcing the hash).
+
+**Note that the salt must be kept secret**.
+
 
 
 
