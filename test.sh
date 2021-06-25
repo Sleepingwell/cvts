@@ -10,6 +10,8 @@
 # for this we still want to use the source (not installed) version
 export PYTHONPATH=`pwd`
 
+export CVTS_INITIAL_SETUP_AND_TEST=1
+
 # get export valhalla env variables
 eval `python cvts/settings.py`
 
@@ -43,7 +45,7 @@ bin/csv2json test.csv test.json 0
 
 # and produce some output
 export LD_LIBRARY_PATH=/usr/local/lib
-valhalla_service valhalla.json trace_attributes test.json > snap.json
+valhalla_service "$CVTS_VALHALLA_CONFIG_FILE" trace_attributes test.json > snap.json
 
 # and turn this into geojson
 bin/json2geojson snap.json snap.geojson
