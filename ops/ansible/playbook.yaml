@@ -1,0 +1,4 @@
+---
+- import_playbook: localhost.yaml
+- import_playbook: mapmatcher.yaml
+- import_playbook: postgis.yaml
