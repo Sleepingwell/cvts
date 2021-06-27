@@ -84,13 +84,20 @@ data. One can optionally set specify the the following environment variables
 
 #### General
 
+- *CVTS_MONGO_CONNECTION_STRING*: A connection string for a MongoDB. If this is
+  specified, then raw data will be read from that DB. In the present setup, the
+  string would look something like:
+
+  *mongodb://<username>:<password>@<host-ip-or-name>:27017/wb*.
+
 - *CVTS_DEBUG*: Run in debug. `False` can be represented by *0* or *False*
   (anything else will be treated as `True`.
 
 - *CVTS_WORK_PATH*: The working directory. Defaults to *~/.cvts*.
 
 - *CVTS_RAW_PATH*: The directory in which the raw data is stored. This must be
-  specified.
+  specified unless the environment variable *CVTS_MONGO_CONNECTION_STRING* is
+  set.
 
 - *CVTS_ANON_RAW_PATH*: The directory in which to store the outputs of
   *bin/anonymizeregos*. If not specified, this will be created under the

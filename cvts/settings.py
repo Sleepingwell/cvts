@@ -14,6 +14,28 @@ if _building:
     # if we don't do it here, it gets expanded when setting WORK_PATH below.
     os.environ['CVTS_WORK_PATH'] = '~/.cvts'
 
+    #---------------------------------------------------------------------------
+    #                            *****IMPORTANT*****
+    # Set these to None because they may contain passwords.
+    #---------------------------------------------------------------------------
+    os.environ.pop('CVTS_MONGO_CONNECTION_STRING', None)
+
+#: The connections string for MongoDB. If present, raw data is read from this
+#: DB. Read from the environment variable *CVTS_MONGO_CONNECTION_STRING*.
+MONGO_CONNECTION_STRING = os.environ.get('CVTS_MONGO_CONNECTION_STRING', None)
+
+#: Are we reading raw data from MongoDB. ``True`` if the environment variable
+#: *MONGO_CONNECTION_STRING* is set.
+RAW_FROM_MONGO = MONGO_CONNECTION_STRING is not None
+
+_raw_dir_must_exist = not (
+    RAW_FROM_MONGO \
+    or _building \
+    or _initial_setup_and_test)
+
+#! The number of documents to process if in DEBUG mode.
+DEBUG_DOC_LIMIT = 10000
+
 #: The minimum time a vehicle must not move for to be considered 'stopped' in
 #: seconds.
 MIN_STOP_TIME     = 20 * 60
@@ -50,7 +72,7 @@ WORK_PATH       = os.environ.get(
     'CVTS_WORK_PATH', os.path.join(os.path.expanduser("~"), '.cvts'))
 
 #: Root directory for :doc:`input files<input>`.
-RAW_PATH        = _get_path('raw', not (_building or _initial_setup_and_test))
+RAW_PATH        = _get_path('raw', _raw_dir_must_exist)
 
 #: Root directory for anonymized :doc:`input files<input>`. These are generated
 #: by the script

@@ -11,8 +11,10 @@ setup(
     scripts=[
         'bin/csv2json',
         'bin/json2geojson',
+        'bin/processtraces',
         'bin/regioncounts',
-        'bin/speed'],
+        'bin/speed',
+        'bin/testmongoconnection'],
     install_requires=[
         'dataclasses',
         'luigi',
@@ -26,5 +28,7 @@ setup(
     extras_require={
         "dev": [
             "sphinx",
-            "sphinx-autodoc-typehints"]}
+            "sphinx-autodoc-typehints"],
+        "mongo": [
+            "pymongo"]}
 )

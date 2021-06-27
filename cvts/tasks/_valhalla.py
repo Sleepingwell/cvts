@@ -8,14 +8,31 @@ import logging
 from glob import glob
 from collections import defaultdict
 from multiprocessing import Pool
+from hashlib import sha256 as _hasher
+from tqdm import tqdm
 import luigi
+from .. import (
+    rawfiles2jsonchunks,
+    json2geojson,
+    mongodoc2jsonchunks)
 from ..settings import (
+    DEBUG,
+    DEBUG_DOC_LIMIT,
     RAW_PATH,
     OUT_PATH,
     MM_PATH,
     SEQ_PATH,
+    MONGO_CONNECTION_STRING,
+    RAW_FROM_MONGO,
     VALHALLA_CONFIG_FILE)
-from .. import rawfiles2jsonchunks, json2geojson
+
+if RAW_FROM_MONGO:
+    from ..mongo import (
+        vehicle_ids,
+        docs_for_vehicle,
+        _init_db_connection)
+else:
+    def _init_db_connection(): pass
 
 
 
@@ -23,11 +40,17 @@ logger = logging.getLogger(__name__)
 
 
 
+MONGO_VALUE = 'mongo'
 POINT_KEYS = ('lat', 'lon', 'time', 'heading', 'speed', 'heading_tolerance')
 TMP_DIR = tempfile.gettempdir()
 EDGE_KEYS = ('way_id', 'speed', 'speed_limit')
 EDGE_ATTR_NAMES = ('way_id', 'valhalla_speed', 'speed_limit')
 NAS = ('NA',) * len(EDGE_KEYS)
+
+
+
+def hasher(rego):
+    return _hasher(rego.encode('utf-8')).hexdigest()[:24]
 
 
 
@@ -41,9 +64,9 @@ def _getedgeattrs(edge):
 
 
 
-def _run_valhalla(fn, trip, trip_index):
-    tmp_file_in  = os.path.join(TMP_DIR, str(trip_index) + '_in_'  + fn)
-    tmp_file_out = os.path.join(TMP_DIR, str(trip_index) + '_out_' + fn)
+def _run_valhalla(rego, trip, trip_index):
+    tmp_file_in  = os.path.join(TMP_DIR, str(trip_index) + '_in_'  + rego)
+    tmp_file_out = os.path.join(TMP_DIR, str(trip_index) + '_out_' + rego)
 
     try:
         with open(tmp_file_in, 'w') as jf:
@@ -65,20 +88,7 @@ def _run_valhalla(fn, trip, trip_index):
 
 
 
-def _process_files(fns):
-    fn          = fns[0]
-    input_files = fns[1]
-    rego        = os.path.splitext(fn)[0]
-
-    assert(fn.endswith('.csv'))
-
-    pnt_file = os.path.join(MM_PATH, fn)
-    seq_file = os.path.join(SEQ_PATH, '{}.json'.format(rego))
-
-    if os.path.exists(pnt_file) and os.path.exists(seq_file):
-        logger.info('skipping: {} (done)'.format(rego))
-        return
-
+def _process_trips(rego, trips, pnt_file, seq_file):
     def run_trip(trip, trip_index):
         try:
             way_ids = {
@@ -95,7 +105,7 @@ def _process_files(fns):
                         'lon': trip['shape'][-1]['lon']}}}
 
             try:
-                snapped = _run_valhalla(fn, trip, trip_index)
+                snapped = _run_valhalla(rego, trip, trip_index)
 
             except:
                 raise Exception('valhalla failure')
@@ -136,7 +146,6 @@ def _process_files(fns):
                     ','.join(str(t) for t in tup)) for tup in result)
                 return trip_desc
 
-            trips = rawfiles2jsonchunks(input_files, True)
             results = (run_trip(trip, ti) for ti, trip in enumerate(trips))
             json.dump([write_trips(*r) for r in results], seqfile)
 
@@ -144,9 +153,39 @@ def _process_files(fns):
         logger.exception('processing {} failed...'.format(rego))
 
     else:
-        logger.info('processing {} passed'.format(rego))
+        logger.debug('processing {} passed'.format(rego))
 
 
+
+def _process_files(fns):
+    fn          = fns[0]
+    input_files = fns[1]
+
+    if isinstance(input_files, str):
+        if input_files == MONGO_VALUE:
+            rego = hasher(fn)
+        else:
+            assert(fn.endswith('.csv'))
+            rego = os.path.splitext(fn)[0]
+    else:
+        rego = os.path.splitext(fn)[0]
+
+    pnt_file = os.path.join(MM_PATH,  '{}.csv'.format(rego))
+    seq_file = os.path.join(SEQ_PATH, '{}.json'.format(rego))
+
+    if os.path.exists(pnt_file) and os.path.exists(seq_file):
+        logger.info('skipping: {} (done)'.format(rego))
+        return
+
+    # Can't do this in the block above if we want to check that we must proceed
+    # first.
+    if isinstance(input_files, str) and input_files == MONGO_VALUE:
+        doc   = docs_for_vehicle(fn)
+        trips = mongodoc2jsonchunks(doc, True)
+    else:
+        trips = rawfiles2jsonchunks(input_files, True)
+
+    return _process_trips(rego, trips, pnt_file, seq_file)
 
 #-------------------------------------------------------------------------------
 # Luigi tasks
@@ -158,10 +197,15 @@ class ListRawFiles(luigi.Task):
 
     def run(self):
         """:meta private:"""
-        input_files = defaultdict(list)
-        for root, dirs, files in os.walk(RAW_PATH):
-            for f in files:
-                input_files[f].append(os.path.join(root, f))
+        if RAW_FROM_MONGO:
+            limit = DEBUG_DOC_LIMIT if DEBUG else None
+            input_files = {v: MONGO_VALUE for v in vehicle_ids(limit)}
+
+        else:
+            input_files = defaultdict(list)
+            for root, dirs, files in os.walk(RAW_PATH):
+                for f in files:
+                    input_files[f].append(os.path.join(root, f))
 
         with open(self.output().fn, 'wb') as pf:
             pickle.dump(input_files, pf)
@@ -189,8 +233,10 @@ class MatchToNetwork(luigi.Task):
             input_files = pickle.load(input_files_file)
 
         # do the jobby
-        with Pool() as p:
-            p.map(_process_files, input_files.items())
+        with Pool(initializer = _init_db_connection) as workers:
+            work = workers.imap_unordered(_process_files, input_files.items())
+            # wrap in list so we wait for jobby to finish.
+            list(tqdm(work, total=len(input_files)))
 
         # list the (seq) output files
         seq_output_files = glob(os.path.join(SEQ_PATH, '*'))
