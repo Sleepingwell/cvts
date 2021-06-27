@@ -75,6 +75,7 @@ def _loadcsv(csvfile):
     with open(csvfile, 'r') as cf:
         reader = csv.DictReader(cf)
         return [{
+            # yes, Longitude and Latitude are back to front.
             'lat': float(row['Longitude']),
             'lon': float(row['Latitude']),
             'time': float(row['Time']),
@@ -108,7 +109,8 @@ def _prepjson(locs, split_trips):
 def rawfiles2jsonchunks(
         csv_file: Union[str, Iterable[str]],
         split_trips: bool) -> Generator[Dict[str, Any], None, None]:
-    """Create a generator over all the data for a single vehicle.
+    """Create a generator over all the data for a single vehicle from data in a
+    csv or iterable of csvs.
 
     :param csv_file: Either the name of a
         :ref:`GPS data<gps-data>` file or an iterable of names of such files.
@@ -120,16 +122,14 @@ def rawfiles2jsonchunks(
         point. Each dict looks like::
 
             {
-                'lat': float(row['Longitude']),
-                'lon': float(row['Latitude']),
-                'time': float(row['Time']),
+                'lat':     float(row['Longitude']),
+                'lon':     float(row['Latitude']),
+                'time':    float(row['Time']),
                 'heading': float(row['Orientation']),
-                'speed': float(row['speed']),
+                'speed':   float(row['speed']),
                 'heading_tolerance': 45,
-                'type': 'via'
+                'type':    'via'
             }
-
-        where ``row`` is a row from the input file.
     """
 
     raw_locs = _loadcsv(csv_file) \
@@ -154,6 +154,7 @@ def rawfiles2jsonfile(
     chunks = rawfiles2jsonchunks(csv_file, False)
     with open(out_file, 'w') as jf:
         json.dump(next(chunks), jf, indent=4)
+
 
 
 def json2geojson(data: Dict[str, Any]) -> Dict[str, Any]:

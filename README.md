@@ -80,12 +80,32 @@ Configuration is controlled by *cvts/settings.py*. This expects the environment
 variable *CVTS_WORK_PATH* to be set, which specifies the root folder for input/output
 data. One can optionally set specify the the following environment variables
 
-- *CVTS_BOUNDARIES_PATH*: The directory in regional shape files are stored,
+### Environment Variables
 
-- *CVTS_RAW_PATH*: The directory in which the raw data is stored,
+#### General
+
+- *CVTS_DEBUG*: Run in debug. `False` can be represented by *0* or *False*
+  (anything else will be treated as `True`.
+
+- *CVTS_WORK_PATH*: The working directory. Defaults to *~/.cvts*.
+
+- *CVTS_RAW_PATH*: The directory in which the raw data is stored. This must be
+  specified.
+
+- *CVTS_ANON_RAW_PATH*: The directory in which to store the outputs of
+  *bin/anonymizeregos*. If not specified, this will be created under the
+  directory specified by *CVTS_WORK_PATH*.
+
+- *CVTS_BOUNDARIES_PATH*: The directory in regional shape files are stored. If
+  not specified it will be assumed to be under under the directory specified by
+  *CVTS_WORK_PATH*. If that is not present and boundaries are required,
+  something will go bang.
 
 - *CVTS_CONFIG_PATH*: The directory in which the configuration data is stored
   (see the [documentation for the config directory](doc/README-config-folder.md
-  for details), and
+  for details). If that is not present and boundaries are required, something
+  will go bang.
 
-- *CVTS_OUT_PATH*: The directory where outputs will be saved.
+- *CVTS_OUTPUT_PATH*: The directory where outputs will be saved. If not
+  specified, this will be created under the directory specified by
+  *CVTS_WORK_PATH*.

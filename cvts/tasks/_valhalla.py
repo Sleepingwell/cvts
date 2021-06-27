@@ -157,6 +157,7 @@ class ListRawFiles(luigi.Task):
     pickle_file_name = os.path.join(OUT_PATH, 'raw_files.pkl')
 
     def run(self):
+        """:meta private:"""
         input_files = defaultdict(list)
         for root, dirs, files in os.walk(RAW_PATH):
             for f in files:
@@ -166,6 +167,7 @@ class ListRawFiles(luigi.Task):
             pickle.dump(input_files, pf)
 
     def output(self):
+        """:meta private:"""
         return luigi.LocalTarget(self.pickle_file_name)
 
 
