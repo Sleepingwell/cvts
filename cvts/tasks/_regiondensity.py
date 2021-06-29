@@ -140,7 +140,10 @@ def _do_stops(filename):
         stops = json.load(fin)
 
     stopiter = iter(stops)
-    t0 = next(stopiter)
+    try:
+        t0 = next(stopiter)
+    except StopIteration:
+        return
     p0 = t0['start']['loc']
     yield p0['lon'], p0['lat']
     for t1 in stopiter:
