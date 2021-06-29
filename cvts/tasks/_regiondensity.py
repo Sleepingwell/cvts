@@ -7,6 +7,7 @@ from multiprocessing import Pool
 from functools import partial
 from datetime import timezone, timedelta
 from math import floor, ceil
+import logging
 import numpy as np
 from tqdm import tqdm
 import luigi
@@ -20,6 +21,10 @@ from ..settings import (
     SRC_DEST_PATH,
     BOUNDARIES_PATH)
 from ._valhalla import MatchToNetwork
+
+
+
+logger = logging.getLogger(__name__)
 
 
 
@@ -91,10 +96,13 @@ class _Grid:
 
     def increment(self, lon, lat):
         """Increment the count in cell containing the point (*lon*, *lat*)."""
-        row = self.nrow - int(floor((lon - self.minlon) / self.cellsize)) - 1
-        col =             int(floor((lat - self.minlat) / self.cellsize))
-        if 0 <= col < self.ncol and 0 <= row < self.nrow:
-            self.cells[row, col] += 1
+        try:
+            row = self.nrow - int(floor((lon - self.minlon) / self.cellsize)) - 1
+            col =             int(floor((lat - self.minlat) / self.cellsize))
+            if 0 <= col < self.ncol and 0 <= row < self.nrow:
+                self.cells[row, col] += 1
+        except ValueError as e:
+            logger.warning('value error: {} at ({:.2f}, {:.2f})'.format(e, lat, lon))
         # TODO: warning here?
 
     def save(self, fn):
