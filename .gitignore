@@ -7,3 +7,4 @@ test/
 venv/
 cvts.egg-info/
 doc/build/
+doc/source/cvts*.rst

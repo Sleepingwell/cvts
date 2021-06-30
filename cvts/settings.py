@@ -1,9 +1,13 @@
 import os
 
-DEBUG = False
+def _bool_from_env(ev):
+    return os.environ.get(ev, 'False') not in ('0', 'False')
 
-_building = bool(os.environ.get('BUILDING_CVTS_DOC', False))
-_initial_setup_and_test = bool(os.environ.get('CVTS_INITIAL_SETUP_AND_TEST', False))
+#: Are we debugging. Can be set via the environment variable *CVTS_DEBUG*.
+DEBUG = _bool_from_env('CVTS_DEBUG')
+
+_building = _bool_from_env('BUILDING_CVTS_DOC')
+_initial_setup_and_test = _bool_from_env('CVTS_INITIAL_SETUP_AND_TEST')
 
 if _building:
     # Sphinx puts the path in the documentation... so make it the default.

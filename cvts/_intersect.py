@@ -30,6 +30,9 @@ def points_to_polys(
     :return: The geometry ID for each point.
     """
 
+    # Remove points containing NaNs.
+    points = points[~np.any(np.isnan(points), 1),]
+
     # Compute inds, but map back to keys
     keys = np.hstack((shapedata[0], [-1]))
     meshblock_inds = _points_to_shapes(points, shapedata)
