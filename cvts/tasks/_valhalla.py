@@ -88,7 +88,7 @@ def _run_valhalla(rego, trip, trip_index):
 
 
 
-def _process_trips(rego, trips, pnt_file, seq_file):
+def _process_trips(rego, trips, mm_file_name, seq_file_name):
     def run_trip(trip, trip_index):
         try:
             way_ids = {
@@ -132,17 +132,17 @@ def _process_trips(rego, trips, pnt_file, seq_file):
                 (e_str,) for p in trip['shape']]
 
     try:
-        with open(pnt_file, 'w') as resultsfile, open(seq_file , 'w') as seqfile:
+        with open(mm_file_name, 'w') as mmfile, open(seq_file_name , 'w') as seqfile:
 
             # write the header (to the mm file)
-            resultsfile.write(','.join(
+            mmfile.write(','.join(
                 POINT_KEYS + \
                 ('status', 'trip_index') + \
                 EDGE_ATTR_NAMES + \
                 ('message',)) + '\n')
 
             def write_trips(trip_desc, result):
-                resultsfile.writelines('{}\n'.format(
+                mmfile.writelines('{}\n'.format(
                     ','.join(str(t) for t in tup)) for tup in result)
                 return trip_desc
 
@@ -170,10 +170,10 @@ def _process_files(fns):
     else:
         rego = os.path.splitext(fn)[0]
 
-    pnt_file = os.path.join(MM_PATH,  '{}.csv'.format(rego))
-    seq_file = os.path.join(SEQ_PATH, '{}.json'.format(rego))
+    mm_file_name  = os.path.join(MM_PATH,  '{}.csv'.format(rego))
+    seq_file_name = os.path.join(SEQ_PATH, '{}.json'.format(rego))
 
-    if os.path.exists(pnt_file) and os.path.exists(seq_file):
+    if os.path.exists(mm_file_name) and os.path.exists(seq_file_name):
         logger.info('skipping: {} (done)'.format(rego))
         return
 
@@ -185,7 +185,7 @@ def _process_files(fns):
     else:
         trips = rawfiles2jsonchunks(input_files, True)
 
-    return _process_trips(rego, trips, pnt_file, seq_file)
+    return _process_trips(rego, trips, mm_file_name, seq_file_name)
 
 #-------------------------------------------------------------------------------
 # Luigi tasks
