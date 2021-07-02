@@ -10,12 +10,6 @@ import luigi
 from cvts.settings import OUT_PATH, SPEED_PATH
 from ._valhalla import MatchToNetwork
 
-
-
-logger = logging.getLogger(__name__)
-
-
-
 AVE_SPEED_FILE = 'ave_speeds.pkl'
 
 

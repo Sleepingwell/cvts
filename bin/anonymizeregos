@@ -19,8 +19,6 @@ import luigi
 from cvts.settings import ANON_RAW_PATH, RAW_PATH
 from cvts.tasks import ListRawFiles
 
-logging.basicConfig(level=logging.INFO)
-
 def hasher(rego):
     to_hash = '{}{}'.format(rego, salt).encode('utf-8')
     return _hasher(to_hash).hexdigest()[:12]

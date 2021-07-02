@@ -4,6 +4,4 @@ import logging
 import luigi
 from cvts.tasks import MatchToNetwork
 
-logging.basicConfig(level=logging.INFO)
-
 luigi.build([MatchToNetwork()], local_scheduler=True)

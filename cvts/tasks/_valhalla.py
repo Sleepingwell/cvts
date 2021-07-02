@@ -174,7 +174,7 @@ def _process_files(fns):
     seq_file_name = os.path.join(SEQ_PATH, '{}.json'.format(rego))
 
     if os.path.exists(mm_file_name) and os.path.exists(seq_file_name):
-        logger.info('skipping: {} (done)'.format(rego))
+        logger.debug('skipping: {} (done)'.format(rego))
         return
 
     # Can't do this in the block above if we want to check that we must proceed

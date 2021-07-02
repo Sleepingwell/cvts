@@ -1,4 +1,6 @@
 import os
+import logging
+from datetime import datetime as dt
 
 def _bool_from_env(ev):
     return os.environ.get(ev, 'False') not in ('0', 'False')
@@ -34,7 +36,7 @@ _raw_dir_must_exist = not (
     or _initial_setup_and_test)
 
 #! The number of documents to process if in DEBUG mode.
-DEBUG_DOC_LIMIT = 10000
+DEBUG_DOC_LIMIT   = 10000
 
 #: The minimum time a vehicle must not move for to be considered 'stopped' in
 #: seconds.
@@ -109,6 +111,14 @@ if not _building:
     for p in (ANON_RAW_PATH, CONFIG_PATH, OUT_PATH, SEQ_PATH, MM_PATH, STOP_PATH, SRC_DEST_PATH, SPEED_PATH):
         if not os.path.exists(p):
             os.makedirs(p)
+
+# basic logging setup
+logging.basicConfig(level=logging.DEBUG if DEBUG else logging.INFO)
+fileHandler = logging.FileHandler(os.path.join(OUT_PATH, "run-{}.log".format(
+    dt.now().isoformat().replace(':', '-').replace('.', '-'))))
+fileHandler.setLevel(logging.INFO)
+rootLogger = logging.getLogger()
+rootLogger.addHandler(fileHandler)
 
 if __name__ == '__main__':
     # this won't work on windows
