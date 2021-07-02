@@ -26,6 +26,7 @@ setup(
         'tqdm'],
     extras_require={
         "dev": [
+            "ipython",
             "sphinx",
             "sphinx-autodoc-typehints"],
         "mongo": [
