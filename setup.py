@@ -9,6 +9,7 @@ setup(
     python_requires='>=3',
     packages=find_packages(),
     scripts=[
+        'bin/anonymizeregos',
         'bin/createpgdb',
         'bin/csv2json',
         'bin/json2geojson',

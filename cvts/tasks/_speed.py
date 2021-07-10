@@ -116,7 +116,7 @@ class AverageSpeed(luigi.Task):
 
         with Pool() as p:
             workers = p.imap_unordered(_process_file, mm_files)
-            for i in tqdm(workers, total=len(mm_files)): pass
+            list(tqdm(workers, total=len(mm_files)))
 
         with open(self.output().fn, 'wb') as of:
             output_files = glob(os.path.join(SPEED_PATH, '*-speed.csv'))

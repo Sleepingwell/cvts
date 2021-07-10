@@ -5,7 +5,7 @@ DOC_BUILD_DIR=/tmp/cvts-pages
 initial-setup: setup-valhalla venv sphinx-doc
 
 setup-valhalla:
-	./setup-valhalla.sh
+	./scripts/setup-valhalla.sh
 
 venv: clean
 	rm -rf venv

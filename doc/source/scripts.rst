@@ -82,6 +82,13 @@ Script to generate the database defined by the (ORM) classes in
 **BE CAREFUL WITH THIS... it will first drop tables and alike created previously
 and hence you can lose your data**.
 
+testmongoconnection
+-------------------
+
+Test if we can connect to the mongo db. Requires that the Python package
+`pymongo`_ be installed, which can be done by installing the optional
+dependencies _mongo_ of this package.
+
 
 
 .. _trace_attributes: https://valhalla.readthedocs.io/en/latest/api/map-matching/api-reference/#outputs-of-trace_attributes
@@ -89,3 +96,5 @@ and hence you can lose your data**.
 .. _Luigi: https://github.com/spotify/luigi
 
 .. _tasks: https://luigi.readthedocs.io/en/stable/tasks.html
+
+.. _pymongo: https://pypi.org/project/pymongo/

@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 import os
 import json
 import pickle
@@ -141,6 +139,7 @@ def _process_trips(rego, trips, mm_file_name, seq_file_name):
                 EDGE_ATTR_NAMES + \
                 ('message',)) + '\n')
 
+            # write a trip (to the mm file)
             def write_trips(trip_desc, result):
                 mmfile.writelines('{}\n'.format(
                     ','.join(str(t) for t in tup)) for tup in result)

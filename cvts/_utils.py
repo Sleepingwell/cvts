@@ -174,6 +174,7 @@ def rawfiles2jsonchunks(
     raw_locs = _loadcsv(csv_file) \
         if isinstance(csv_file, str) \
         else reduce(lambda a, b: a + _loadcsv(b), csv_file, [])
+
     return _prepjson(raw_locs, split_trips)
 
 
