@@ -81,7 +81,7 @@ class AverageSpeed(luigi.Task):
             for i in tqdm(workers, total=len(mm_files)): pass
 
         with open(self.output().fn, 'wb') as of:
-            output_files = glob(os.path.join(SPEED_PATH, '*'))
+            output_files = glob(os.path.join(SPEED_PATH, '*-speed.csv'))
             with open(self.output().fn, 'wb') as pf:
                 pickle.dump(output_files, pf)
 
