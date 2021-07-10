@@ -52,23 +52,23 @@ processtraces
 
 Script for matching all raw data to the road network.
 
-regioncounts
-------------
+processall
+----------
 
 Script for extracting:
 
 - stops by region,
-- stops on a (0.1 degree) raster, and
-- source and destination counts.
+- stops on a (0.1 degree) raster,
+- source and destination counts,
+- speeds by :term:`way ids<way id>`. These are calculated by road segment by
+  time of day for each vehicle. These are first produced on disk, then saved in
+  an SQL database (see :py:class:`cvts.models.Traversal` for an ORM
+  representation of the the rows).
 
-speed
------
+Because of the dependencies, this would also trigger the (`Luigi`_) tasks that
+would be run by `processtraces`_ if required.
 
-Script for calculating speed by road segment by time of day for each vehicle.
-What we would really like, is to have the results of this summarised for all
-vehicles. We have not yet got to doing that, which would be best done with a
-DB, Hadoop or some other thing that would be more suited than straight Python
-code.
+
 
 
 .. _trace_attributes: https://valhalla.readthedocs.io/en/latest/api/map-matching/api-reference/#outputs-of-trace_attributes

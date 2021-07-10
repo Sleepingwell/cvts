@@ -11,9 +11,8 @@ setup(
     scripts=[
         'bin/csv2json',
         'bin/json2geojson',
+        'bin/processall',
         'bin/processtraces',
-        'bin/regioncounts',
-        'bin/speed',
         'bin/testmongoconnection'],
     install_requires=[
         'dataclasses',
