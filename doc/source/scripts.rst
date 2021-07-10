@@ -70,6 +70,19 @@ would be run by `processtraces`_ if required.
 
 
 
+Misc
+====
+
+createpgdb
+----------
+
+Script to generate the database defined by the (ORM) classes in
+:py:mod:`cvts.models`.
+
+**BE CAREFUL WITH THIS... it will first drop tables and alike created previously
+and hence you can lose your data**.
+
+
 
 .. _trace_attributes: https://valhalla.readthedocs.io/en/latest/api/map-matching/api-reference/#outputs-of-trace_attributes
 

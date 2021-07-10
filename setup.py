@@ -9,6 +9,7 @@ setup(
     python_requires='>=3',
     packages=find_packages(),
     scripts=[
+        'bin/createpgdb',
         'bin/csv2json',
         'bin/json2geojson',
         'bin/processall',
@@ -21,8 +22,10 @@ setup(
         'numpy',
         'pandas',
         'pyshp',
+        'psycopg2-binary', # couldn't get 'non-binary' to install.
         'scipy',
         'shapely',
+        'sqlalchemy',
         'tqdm'],
     extras_require={
         "dev": [

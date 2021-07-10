@@ -84,20 +84,32 @@ data. One can optionally set specify the the following environment variables
 
 #### General
 
+- *CVTS_DEBUG*: Run in debug. `False` can be represented by *0* or *False*
+  (anything else will be treated as `True`.
+
+
+#### Data
+
 - *CVTS_MONGO_CONNECTION_STRING*: A connection string for a MongoDB. If this is
   specified, then raw data will be read from that DB. In the present setup, the
   string would look something like:
 
   *mongodb://<username>:<password>@<host-ip-or-name>:27017/wb*.
 
-- *CVTS_DEBUG*: Run in debug. `False` can be represented by *0* or *False*
-  (anything else will be treated as `True`.
+- *CVTS_POSTGRES_CONNECTION_STRING*: A connection string for the Postgres DB to
+  write outputs to. The string would look something like:
 
-- *CVTS_WORK_PATH*: The working directory. Defaults to *~/.cvts*.
+  *postgresql://<username>:<password>@<host-ip-or-name>:27017/cvts*.
+
+  I set this in my *~/.bashrc* as described below.
 
 - *CVTS_RAW_PATH*: The directory in which the raw data is stored. This must be
   specified unless the environment variable *CVTS_MONGO_CONNECTION_STRING* is
   set.
+
+- *CVTS_WORK_PATH*: The working directory. Defaults to *~/.cvts*. All other
+  output directories (with the exception of the raw data directory) are
+  created or assumed to exist if not otherwise specified.
 
 - *CVTS_ANON_RAW_PATH*: The directory in which to store the outputs of
   *bin/anonymizeregos*. If not specified, this will be created under the
@@ -116,3 +128,21 @@ data. One can optionally set specify the the following environment variables
 - *CVTS_OUTPUT_PATH*: The directory where outputs will be saved. If not
   specified, this will be created under the directory specified by
   *CVTS_WORK_PATH*.
+
+
+#### Postgres
+
+Some results are saved in postgres.
+
+I set the connection string up in my *~/.bashrc* with the following.
+
+```
+CVTS_POSTGRES_IP=localhost
+export CVTS_POSTGRES_PORT=5432
+export CVTS_POSTGRES_DB=cvts
+export CVTS_POSTGRES_USER=cvts
+export CVTS_POSTGRES_PASS=secure-password
+export CVTS_POSTGRES_CONNECTION_STRING=postgresql://"$CVTS_POSTGRES_USER":"$CVTS_POSTGRES_PASS"@"$CVTS_POSTGRES_IP":"$CVTS_POSTGRES_PORT"/"$CVTS_POSTGRES_DB"
+```
+
+With these environment variables exported, the script *scripts/start-docker-postgres.sh* is a convenient way of created a local db for testing.

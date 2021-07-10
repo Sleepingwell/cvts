@@ -6,10 +6,14 @@ from cvts.tasks import (
     RasterCounts,
     RegionCounts,
     SourceDestinationCounts,
-    AverageSpeed)
+    AverageSpeed,
+    TripsToDB
+    )
 
 luigi.build([
     RasterCounts(),
     RegionCounts('District'),
     SourceDestinationCounts('trans_cities'),
-    AverageSpeed()], local_scheduler=True)
+    AverageSpeed(),
+    TripsToDB()
+    ], local_scheduler=True)

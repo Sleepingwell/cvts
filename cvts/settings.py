@@ -21,10 +21,15 @@ if _building:
     # Set these to None because they may contain passwords.
     #---------------------------------------------------------------------------
     os.environ.pop('CVTS_MONGO_CONNECTION_STRING', None)
+    os.environ.pop('CVTS_POSTGRES_CONNECTION_STRING', None)
 
 #: The connections string for MongoDB. If present, raw data is read from this
 #: DB. Read from the environment variable *CVTS_MONGO_CONNECTION_STRING*.
 MONGO_CONNECTION_STRING = os.environ.get('CVTS_MONGO_CONNECTION_STRING', None)
+
+#: The connections string for PostGRE. Read from the environment variable
+#: *CVTS_POSTGRES_CONNECTION_STRING*.
+POSTGRES_CONNECTION_STRING = os.environ.get('CVTS_POSTGRES_CONNECTION_STRING', None)
 
 #: Are we reading raw data from MongoDB. ``True`` if the environment variable
 #: *MONGO_CONNECTION_STRING* is set.
