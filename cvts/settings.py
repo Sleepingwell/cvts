@@ -40,6 +40,9 @@ _raw_dir_must_exist = not (
     or _building \
     or _initial_setup_and_test)
 
+#: The collections to limit ourselves to in the MongoDB.
+MONGO_COLLECTION_NAMES = None
+
 #! The number of documents to process if in DEBUG mode.
 DEBUG_DOC_LIMIT   = 10000
 

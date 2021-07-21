@@ -26,6 +26,7 @@ from ..settings import (
 
 if RAW_FROM_MONGO:
     from ..mongo import (
+        create_indexes,
         vehicle_ids,
         docs_for_vehicle,
         _init_db_connection)
@@ -227,6 +228,11 @@ class MatchToNetwork(luigi.Task):
 
     def run(self):
         """:meta private:"""
+
+        # first, ensure that mongo tables have indexes
+        if RAW_FROM_MONGO:
+            create_indexes()
+
         # load the input file data
         with open(self.input().fn, 'rb') as input_files_file:
             input_files = pickle.load(input_files_file)
