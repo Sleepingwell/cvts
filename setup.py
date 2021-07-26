@@ -10,6 +10,7 @@ setup(
     packages=find_packages(),
     scripts=[
         'bin/anonymizeregos',
+        'bin/collectionnames',
         'bin/createpgdb',
         'bin/csv2json',
         'bin/json2geojson',
