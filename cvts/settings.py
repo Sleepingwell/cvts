@@ -121,12 +121,12 @@ if not _building:
             os.makedirs(p)
 
 # basic logging setup
-logging.basicConfig(level=logging.DEBUG if DEBUG else logging.INFO)
-fileHandler = logging.FileHandler(os.path.join(OUT_PATH, "run-{}.log".format(
-    dt.now().isoformat().replace(':', '-').replace('.', '-'))))
-fileHandler.setLevel(logging.INFO)
-rootLogger = logging.getLogger()
-rootLogger.addHandler(fileHandler)
+def setup_logging(level=logging.DEBUG if DEBUG else logging.INFO):
+    logging.basicConfig(level=level)
+    fileHandler = logging.FileHandler(os.path.join(OUT_PATH, "run-{}.log".format(
+        dt.now().isoformat().replace(':', '-').replace('.', '-'))))
+    rootLogger = logging.getLogger()
+    rootLogger.addHandler(fileHandler)
 
 if __name__ == '__main__':
     # this won't work on windows
