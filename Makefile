@@ -1,11 +1,34 @@
 DOC_BUILD_DIR=/tmp/cvts-pages
 
-.PHONY: initial-setup setup-valhalla venv sphinx-doc push-doc clean
+.PHONY: initial-setup latest-cmake setup-valhalla setup-postgre venv sphinx-doc push-doc clean clean-sphinx-doc
 
-initial-setup: setup-valhalla venv sphinx-doc
+initial-setup: latest-cmake setup-valhalla venv sphinx-doc setup-postgre
+
+latest-cmake:
+	sudo apt-get install -y libssl-dev
+	cd /tmp && wget https://github.com/Kitware/CMake/releases/download/v3.21.0/cmake-3.21.0.tar.gz
+	cd /tmp && tar -zxf cmake-3.21.0.tar.gz
+	cd /tmp/cmake-3.21.0 && \
+	    ./bootstrap && \
+	    make && \
+	    sudo make install
 
 setup-valhalla:
 	./scripts/setup-valhalla.sh
+
+setup-postgre:
+	# ---------------------------------------------------------------------
+	# --------------BE CAREFUL: THIS DESTROYS THE EXISTING DB--------------
+	# ---------------------------------------------------------------------
+	echo "DROP DATABASE IF EXISTS ${CVTS_POSTGRES_DB};" > /tmp/cvts.sql
+	echo "DROP USER IF EXISTS ${CVTS_POSTGRES_DB};" >> /tmp/cvts.sql
+	echo "CREATE DATABASE ${CVTS_POSTGRES_DB};" >> /tmp/cvts.sql
+	echo "CREATE USER ${CVTS_POSTGRES_USER} WITH ENCRYPTED PASSWORD '${CVTS_POSTGRES_PASS}';" >> /tmp/cvts.sql
+	echo "GRANT ALL PRIVILEGES ON DATABASE ${CVTS_POSTGRES_DB} TO ${CVTS_POSTGRES_USER};" >> /tmp/cvts.sql
+	chmod 777 /tmp/cvts.sql
+	cd /tmp && sudo -u postgres psql -f /tmp/cvts.sql
+	rm /tmp/cvts.sql
+	. venv/bin/activate && bin/createpgdb
 
 venv: clean
 	rm -rf venv
