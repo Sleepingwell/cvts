@@ -5,9 +5,7 @@ from cvts.settings import setup_logging
 from cvts.tasks import (
     RasterCounts,
     RegionCounts,
-    SourceDestinationCounts,
-    AverageSpeed,
-    TripsToDB)
+    SourceDestinationCounts)
 
 setup_logging()
 
@@ -15,6 +13,4 @@ luigi.build([
     RasterCounts(),
     RegionCounts('District'),
     SourceDestinationCounts('trans_cities'),
-    AverageSpeed(),
-    TripsToDB()
     ], local_scheduler=True)

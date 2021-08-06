@@ -7,12 +7,17 @@ from glob import glob
 from collections import defaultdict
 from multiprocessing import Pool
 from hashlib import sha256 as _hasher
+import numpy as np
+import pandas as pd
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 from tqdm import tqdm
 import luigi
 from .. import (
     rawfiles2jsonchunks,
     json2geojson,
     mongodoc2jsonchunks)
+from ..models import Traversal
 from ..settings import (
     DEBUG,
     DEBUG_DOC_LIMIT,
@@ -21,6 +26,7 @@ from ..settings import (
     MM_PATH,
     SEQ_PATH,
     MONGO_CONNECTION_STRING,
+    POSTGRES_CONNECTION_STRING,
     RAW_FROM_MONGO,
     VALHALLA_CONFIG_FILE)
 
@@ -29,9 +35,9 @@ if RAW_FROM_MONGO:
         create_indexes,
         vehicle_ids,
         docs_for_vehicle,
-        _init_db_connection)
+        _init_db_connection as _init_mongo_db_connection)
 else:
-    def _init_db_connection(): pass
+    def _init_mongo_db_connection(): pass
 
 
 
@@ -89,6 +95,70 @@ def _run_valhalla(rego, trip, trip_index):
 
 
 
+_engine = create_engine(POSTGRES_CONNECTION_STRING)
+_session_maker = None
+def _init_db_connections():
+    # see: https://docs.sqlalchemy.org/en/13/core/pooling.html#pooling-multiprocessing
+    global _engine, _session_maker
+    _engine.dispose()
+    _session_maker = sessionmaker(bind=_engine)
+    _init_mongo_db_connection()
+
+def _trips_to_db(rego, speeds):
+    global _session_maker
+    session = _session_maker()
+
+    for index, line in speeds.iterrows():
+        traversal = Traversal(
+            rego    = rego,
+            way     = line['way_id'],
+            hour    = line['hour'],
+            weekday = line['weekDay'],
+            speed   = line['speed'],
+            weight  = line['weight'])
+        session.add(traversal)
+    session.commit()
+
+
+
+def _average_speed(rego, results):
+    df = pd.DataFrame({k:v for k, v in zip(MM_KEYS, r)} for r in results)
+    df.drop(df[(df.status == 'failure') | (df.way_id == NA_VALUE)].index, inplace=True)
+    df.dropna(subset = ['way_id'], inplace=True)
+
+    if df.shape[0] == 0:
+        return None
+
+    # TODO: did I check that int32 was suitable?
+    df['way_id'] = df['way_id'].astype(np.int64)
+
+    # add date and hour
+    dt = pd.to_datetime(df['time'], unit='s').dt
+    df['hour']    = dt.hour
+    df['weekDay'] = dt.weekday
+
+    # average speed
+    def ave_speed(df):
+        # average for each trip
+        tmp = df.groupby('trip_index').agg({'speed': ['mean', 'size']})
+
+        # average for the way_id/hour/weekDay
+        return pd.Series({
+            'speed' : np.average(tmp[('speed', 'mean')], weights=tmp[('speed', 'size')]),
+            'weight': np.sum(tmp[('speed', 'size')])})
+
+    #TODO: Do we want to check 'valhalla_speed' also/instead
+    speed = df[df.speed > 6].groupby(
+        ['way_id', 'hour', 'weekDay']).apply(ave_speed).reset_index()
+
+    if len(speed) != 0:
+        speed["rego"] = rego
+        return speed
+
+    return None
+
+
+
 def _process_trips(rego, trips, mm_file_name, seq_file_name):
     def run_trip(trip, trip_index):
         try:
@@ -140,6 +210,9 @@ def _process_trips(rego, trips, mm_file_name, seq_file_name):
 
             # write a trip (to the mm file)
             def write_trips(trip_desc, result):
+                speeds = _average_speed(rego, result)
+                if speeds is not None:
+                    _trips_to_db(rego, speeds)
                 mmfile.writelines('{}\n'.format(
                     ','.join(str(t) for t in tup)) for tup in result)
                 return trip_desc
@@ -236,7 +309,7 @@ class MatchToNetwork(luigi.Task):
             input_files = pickle.load(input_files_file)
 
         # do the jobby
-        with Pool(initializer = _init_db_connection) as workers:
+        with Pool(initializer = _init_db_connections) as workers:
             work = workers.imap_unordered(_process_files, input_files.items())
             # wrap in list so we wait for jobby to finish.
             list(tqdm(work, total=len(input_files)))
