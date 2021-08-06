@@ -17,7 +17,6 @@ from .. import (
     rawfiles2jsonchunks,
     json2geojson,
     mongodoc2jsonchunks)
-from ..models import Traversal
 from ..settings import (
     DEBUG,
     DEBUG_DOC_LIMIT,
@@ -29,6 +28,7 @@ from ..settings import (
     POSTGRES_CONNECTION_STRING,
     RAW_FROM_MONGO,
     VALHALLA_CONFIG_FILE)
+from ..models import Traversal, Base
 
 if RAW_FROM_MONGO:
     from ..mongo import (
@@ -118,6 +118,13 @@ def _trips_to_db(rego, speeds):
             weight  = line['weight'])
         session.add(traversal)
     session.commit()
+
+def _base_to_db(rego, lng, lat):
+    global _session_maker
+    session = _session_maker()
+    session.add(Base(rego=rego, lng=lng, lat=lat))
+    session.commit()
+
 
 
 
@@ -251,12 +258,17 @@ def _process_files(fns):
     # Can't do this in the block above if we want to check that we must proceed
     # first.
     if isinstance(input_files, str) and input_files == MONGO_VALUE:
-        doc   = docs_for_vehicle(fn)
-        trips = mongodoc2jsonchunks(doc, True)
+        doc = docs_for_vehicle(fn)
+        base, trips = mongodoc2jsonchunks(doc, True)
     else:
-        trips = rawfiles2jsonchunks(input_files, True)
+        base, trips = rawfiles2jsonchunks(input_files, True)
 
-    return _process_trips(rego, trips, mm_file_name, seq_file_name)
+    if base is not None:
+        _base_to_db(rego, base[0], base[1])
+
+    _process_trips(rego, trips, mm_file_name, seq_file_name)
+
+
 
 #-------------------------------------------------------------------------------
 # Luigi tasks

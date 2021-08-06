@@ -1,15 +1,11 @@
 """Module providing an ORM for objects of interest."""
 
-from sqlalchemy import Table, Column, Integer, String, Text, Float, ForeignKey, create_engine
-from sqlalchemy.orm import sessionmaker, relationship, backref, reconstructor
+from sqlalchemy import Column, Integer, String, Float
 from sqlalchemy.ext.declarative import declarative_base
-from cvts.settings import POSTGRES_CONNECTION_STRING
 
-Base = declarative_base()
+DBase = declarative_base()
 
-
-
-class Traversal(Base):
+class Traversal(DBase):
     """A traversal of a :py:class:`Segment`."""
     __tablename__ = 'traversals'
     id            = Column(Integer, primary_key=True)
@@ -19,3 +15,11 @@ class Traversal(Base):
     weekday       = Column(Integer)
     speed         = Column(Float)
     weight        = Column(Float)
+
+class Base(DBase):
+    """The location a vehicle is garraged."""
+    __tablename__ = 'bases'
+    id            = Column(Integer, primary_key=True)
+    rego          = Column(String)
+    lng           = Column(Float)
+    lat           = Column(Float)

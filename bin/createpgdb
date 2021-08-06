@@ -2,8 +2,8 @@
 
 from sqlalchemy import create_engine
 from cvts.settings import POSTGRES_CONNECTION_STRING
-from cvts.models import Base
+from cvts.models import DBase
 
 engine = create_engine(POSTGRES_CONNECTION_STRING)
-Base.metadata.drop_all(engine)
-Base.metadata.create_all(engine)
+DBase.metadata.drop_all(engine)
+DBase.metadata.create_all(engine)

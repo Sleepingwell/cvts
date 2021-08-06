@@ -27,6 +27,7 @@ setup(
         'psycopg2-binary', # couldn't get 'non-binary' to install.
         'scipy',
         'shapely',
+        'sklearn',
         'sqlalchemy',
         'tqdm'],
     extras_require={
