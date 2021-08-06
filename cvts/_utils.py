@@ -220,7 +220,7 @@ def json2geojson(data: Dict[str, Any]) -> Dict[str, Any]:
         matched_point['point_index'] = index
         if edge_index is not None:
             names = ', '.join(edges[edge_index].get("names", ["NA"]))
-            matched_point['osname'] = names
+            matched_point['osmnames'] = names
             matched_point['way_id'] = edges[edge_index].get("way_id", "NA")
 
         return {

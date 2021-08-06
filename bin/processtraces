@@ -5,5 +5,4 @@ from cvts.settings import setup_logging
 from cvts.tasks import MatchToNetwork
 
 setup_logging()
-
 luigi.build([MatchToNetwork()], local_scheduler=True)

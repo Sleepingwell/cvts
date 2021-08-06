@@ -44,7 +44,9 @@ POINT_KEYS = ('lat', 'lon', 'time', 'heading', 'speed', 'heading_tolerance')
 TMP_DIR = tempfile.gettempdir()
 EDGE_KEYS = ('way_id', 'speed', 'speed_limit')
 EDGE_ATTR_NAMES = ('way_id', 'valhalla_speed', 'speed_limit')
-NAS = ('NA',) * len(EDGE_KEYS)
+MM_KEYS = POINT_KEYS + ('status', 'trip_index') + EDGE_ATTR_NAMES + ('message',)
+NA_VALUE = 'NA'
+NAS = (NA_VALUE,) * len(EDGE_KEYS)
 
 
 
@@ -59,7 +61,7 @@ def _getpointattrs(point):
 
 
 def _getedgeattrs(edge):
-    return tuple(edge.get(k, 'NA') for k in EDGE_KEYS)
+    return tuple(edge.get(k, NA_VALUE) for k in EDGE_KEYS)
 
 
 
@@ -134,11 +136,7 @@ def _process_trips(rego, trips, mm_file_name, seq_file_name):
         with open(mm_file_name, 'w') as mmfile, open(seq_file_name , 'w') as seqfile:
 
             # write the header (to the mm file)
-            mmfile.write(','.join(
-                POINT_KEYS + \
-                ('status', 'trip_index') + \
-                EDGE_ATTR_NAMES + \
-                ('message',)) + '\n')
+            mmfile.write(','.join(MM_KEYS) + '\n')
 
             # write a trip (to the mm file)
             def write_trips(trip_desc, result):
