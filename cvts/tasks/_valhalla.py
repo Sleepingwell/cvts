@@ -45,13 +45,13 @@ logger = logging.getLogger(__name__)
 
 
 
-MONGO_VALUE = 'mongo'
-POINT_KEYS = ('lat', 'lon', 'time', 'heading', 'speed', 'heading_tolerance')
 TMP_DIR = tempfile.gettempdir()
-EDGE_KEYS = ('way_id', 'speed', 'speed_limit')
-EDGE_ATTR_NAMES = ('way_id', 'valhalla_speed', 'speed_limit')
-MM_KEYS = POINT_KEYS + ('status', 'trip_index') + EDGE_ATTR_NAMES + ('message',)
+MONGO_VALUE = 'mongo'
 NA_VALUE = 'NA'
+POINT_KEYS = ('lat', 'lon', 'time', 'heading', 'speed', 'heading_tolerance')
+EDGE_KEYS = ('id', 'speed', 'speed_limit')
+EDGE_ATTR_NAMES = ('edge_id', 'valhalla_speed', 'speed_limit')
+MM_KEYS = POINT_KEYS + ('status', 'trip_index') + EDGE_ATTR_NAMES + ('message',)
 NAS = (NA_VALUE,) * len(EDGE_KEYS)
 
 
@@ -111,7 +111,7 @@ def _trips_to_db(rego, speeds):
     for index, line in speeds.iterrows():
         traversal = Traversal(
             rego    = rego,
-            way     = line['way_id'],
+            edge    = str(line['edge_id']),
             hour    = line['hour'],
             weekday = line['weekDay'],
             speed   = line['speed'],
@@ -130,14 +130,14 @@ def _base_to_db(rego, lng, lat):
 
 def _average_speed(rego, results):
     df = pd.DataFrame({k:v for k, v in zip(MM_KEYS, r)} for r in results)
-    df.drop(df[(df.status == 'failure') | (df.way_id == NA_VALUE)].index, inplace=True)
-    df.dropna(subset = ['way_id'], inplace=True)
+    df.drop(df[(df.status == 'failure') | (df.edge_id == NA_VALUE)].index, inplace=True)
+    df.dropna(subset = ['edge_id'], inplace=True)
 
     if df.shape[0] == 0:
         return None
 
     # TODO: did I check that int32 was suitable?
-    df['way_id'] = df['way_id'].astype(np.int64)
+    df['edge_id'] = df['edge_id'].astype(np.int64)
 
     # add date and hour
     dt = pd.to_datetime(df['time'], unit='s').dt
@@ -149,14 +149,14 @@ def _average_speed(rego, results):
         # average for each trip
         tmp = df.groupby('trip_index').agg({'speed': ['mean', 'size']})
 
-        # average for the way_id/hour/weekDay
+        # average for the edge_id/hour/weekDay
         return pd.Series({
             'speed' : np.average(tmp[('speed', 'mean')], weights=tmp[('speed', 'size')]),
             'weight': np.sum(tmp[('speed', 'size')])})
 
     #TODO: Do we want to check 'valhalla_speed' also/instead
     speed = df[df.speed > 6].groupby(
-        ['way_id', 'hour', 'weekDay']).apply(ave_speed).reset_index()
+        ['edge_id', 'hour', 'weekDay']).apply(ave_speed).reset_index()
 
     if len(speed) != 0:
         speed["rego"] = rego
@@ -169,7 +169,7 @@ def _average_speed(rego, results):
 def _process_trips(rego, trips, mm_file_name, seq_file_name):
     def run_trip(trip, trip_index):
         try:
-            way_ids = {
+            trip_data = {
                 'trip_index': trip_index,
                 'start': {
                     'time': int(trip['shape'][ 0]['time']),
@@ -191,20 +191,19 @@ def _process_trips(rego, trips, mm_file_name, seq_file_name):
             # convert the output from Valhalla into our outputs (seq and mm files).
             edges = snapped['edges']
             match_props = ((p.get('edge_index'), p['type']) for p in snapped['matched_points'])
-            way_ids['way_ids'] = [e['way_id'] for e in edges]
-            way_ids['geojson'] = json2geojson(snapped)
-            way_ids['status'] = 'success'
+            trip_data['edge_to_osmids'] = {e['id']:e['osmids'] for e in edges}
+            trip_data['status'] = 'success'
 
-            return way_ids, [_getpointattrs(p) + \
+            return trip_data, [_getpointattrs(p) + \
                 ('success', trip_index) + \
                 (_getedgeattrs(edges[ei]) if ei is not None else NAS) + \
                 (mt,) for p, (ei, mt) in zip(trip['shape'], match_props)]
 
         except Exception as e:
             e_str = '{}: {}'.format(e.__class__.__name__, str(e))
-            way_ids['status'] = 'failure'
-            way_ids['message'] = e_str
-            return way_ids, [_getpointattrs(p) + \
+            trip_data['status'] = 'failure'
+            trip_data['message'] = e_str
+            return trip_data, [_getpointattrs(p) + \
                 ('failure', trip_index) + \
                 NAS + \
                 (e_str,) for p in trip['shape']]

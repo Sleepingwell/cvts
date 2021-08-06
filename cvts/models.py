@@ -9,7 +9,7 @@ class Traversal(DBase):
     """A traversal of a :py:class:`Segment`."""
     __tablename__ = 'traversals'
     id            = Column(Integer, primary_key=True)
-    way           = Column(String)
+    edge          = Column(String)
     rego          = Column(String)
     hour          = Column(Integer)
     weekday       = Column(Integer)
