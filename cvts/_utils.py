@@ -4,7 +4,7 @@ from math import sqrt, radians, cos
 from typing import Dict, Any, Generator, Union, Iterable
 from functools import reduce as reduce
 from ._polyline import decode
-from ._base_calculation import calculate_base
+from ._base_locator import locate_base
 from .settings import (
     MIN_STOP_TIME,
     MIN_MOVING_SPEED,
@@ -142,7 +142,7 @@ def mongodoc2jsonchunks(
         'heading_tolerance': 45,
         'type': 'via'} for d in doc]
 
-    base = calculate_base(
+    base = locate_base(
         [ll['lon'] for ll in raw_locs],
         [ll['lat'] for ll in raw_locs],
         [ll['speed'] for ll in raw_locs])
@@ -181,7 +181,7 @@ def rawfiles2jsonchunks(
         if isinstance(csv_file, str) \
         else reduce(lambda a, b: a + _loadcsv(b), csv_file, [])
 
-    base = calculate_base(
+    base = locate_base(
         [ll['lon'] for ll in raw_locs],
         [ll['lat'] for ll in raw_locs],
         [ll['speed'] for ll in raw_locs])

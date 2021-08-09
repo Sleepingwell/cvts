@@ -1,5 +1,6 @@
 from math import floor, ceil
 import numpy as np
+from scipy.ndimage import convolve
 
 
 
@@ -51,8 +52,25 @@ class Grid:
                 self.cells[row, col] += 1
             return row, col
         except ValueError as e:
-            logger.warning('value error: {} at ({:.2f}, {:.2f})'.format(e, lat, lon))
-        # TODO: warning here?
+            logger.error('value error: {} at ({:.2f}, {:.2f})'.format(e, lat, lon))
+
+    def increment_many(self, lons, lats):
+        """Increment the count in cells containing the points (*lons*, *lats*).
+
+        Should be much more efficient than using :py:meth:`Grid.increment`
+        repeatedly.
+        """
+        row_cols = np.array([
+            self.nrow - (np.floor((lats - self.minlat) / self.cellsize)) - 1,
+                        (np.floor((lons - self.minlon) / self.cellsize))],
+            dtype='int32')
+
+        indexes, counts = np.unique(row_cols, return_counts=True, axis=1)
+        self.cells[indexes[0,:],indexes[1,:]] += counts
+        return row_cols.T
+
+    def convolve(self, kernel):
+        return convolve(self.cells, kernel)
 
     def save(self, fn):
         """Save as ASCII grid."""

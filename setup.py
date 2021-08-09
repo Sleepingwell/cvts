@@ -33,6 +33,7 @@ setup(
     extras_require={
         "dev": [
             "ipython",
+            "pytest",
             "sphinx",
             "sphinx-autodoc-typehints"],
         "mongo": [

@@ -29,6 +29,7 @@ from ..settings import (
     RAW_FROM_MONGO,
     VALHALLA_CONFIG_FILE)
 from ..models import Traversal, Base
+from .._base_locator import EmptyCellsException
 
 if RAW_FROM_MONGO:
     from ..mongo import (
@@ -256,16 +257,21 @@ def _process_files(fns):
 
     # Can't do this in the block above if we want to check that we must proceed
     # first.
-    if isinstance(input_files, str) and input_files == MONGO_VALUE:
-        doc = docs_for_vehicle(fn)
-        base, trips = mongodoc2jsonchunks(doc, True)
-    else:
-        base, trips = rawfiles2jsonchunks(input_files, True)
+    try:
+        if isinstance(input_files, str) and input_files == MONGO_VALUE:
+            doc = docs_for_vehicle(fn)
+            base, trips = mongodoc2jsonchunks(doc, True)
+        else:
+            base, trips = rawfiles2jsonchunks(input_files, True)
 
-    if base is not None:
-        _base_to_db(rego, base[0], base[1])
+        if base is not None:
+            _base_to_db(rego, base[0], base[1])
 
-    _process_trips(rego, trips, mm_file_name, seq_file_name)
+        _process_trips(rego, trips, seq_file_name)
+
+    except EmptyCellsException as e:
+        raise Exception('failed to locate base ({}) for: {}'.format(
+            str(e), rego))
 
 
 
