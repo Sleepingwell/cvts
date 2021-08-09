@@ -14,6 +14,7 @@ from sqlalchemy.orm import sessionmaker
 from tqdm import tqdm
 import luigi
 from .. import (
+    distance,
     rawfiles2jsonchunks,
     json2geojson,
     mongodoc2jsonchunks)
@@ -26,8 +27,9 @@ from ..settings import (
     MONGO_CONNECTION_STRING,
     POSTGRES_CONNECTION_STRING,
     RAW_FROM_MONGO,
-    VALHALLA_CONFIG_FILE)
-from ..models import Traversal, Base
+    VALHALLA_CONFIG_FILE,
+    MIN_DISTANCE_BETWEEN_STOPS)
+from ..models import Vehicle, Base, Stop, Trip, Traversal
 from .._base_locator import EmptyCellsException
 
 if RAW_FROM_MONGO:
@@ -104,27 +106,20 @@ def _init_db_connections():
     _session_maker = sessionmaker(bind=_engine)
     _init_mongo_db_connection()
 
-def _trips_to_db(rego, speeds):
+def write_to_db(vehicle, base, stops, trips, traversals):
     global _session_maker
     session = _session_maker()
-
-    for index, line in speeds.iterrows():
-        traversal = Traversal(
-            rego    = rego,
-            edge    = str(line['edge_id']),
-            hour    = line['hour'],
-            weekday = line['weekDay'],
-            speed   = line['speed'],
-            weight  = line['weight'])
-        session.add(traversal)
+    session.add(vehicle)
+    session.add(base)
+    for ss in stops:
+        for stop in ss:
+            session.add(stop)
+    for trip in trips:
+        session.add(trip)
+    for ts in traversals:
+        for traversal in ts:
+            session.add(traversal)
     session.commit()
-
-def _base_to_db(rego, lng, lat):
-    global _session_maker
-    session = _session_maker()
-    session.add(Base(rego=rego, lng=lng, lat=lat))
-    session.commit()
-
 
 
 
@@ -166,7 +161,7 @@ def _average_speed(rego, results):
 
 
 
-def _process_trips(rego, trips, seq_file_name):
+def _process_trips(rego, trips, seq_file_name, vehicle, base):
     def run_trip(trip, trip_index):
         try:
             trip_data = {
@@ -211,14 +206,77 @@ def _process_trips(rego, trips, seq_file_name):
 
     try:
         with open(seq_file_name , 'w') as seqfile:
-            def write_trips(trip_desc, result):
-                speeds = _average_speed(rego, result)
-                if speeds is not None:
-                    _trips_to_db(rego, speeds)
-                return trip_desc
 
-            results = (run_trip(trip, ti) for ti, trip in enumerate(trips))
-            json.dump([write_trips(*r) for r in results], seqfile)
+            def gen_stops(td1, td2):
+                start_ll = (
+                    td1['end']['loc']['lon'],
+                    td1['end']['loc']['lat'])
+                end_ll = (
+                    td2['start']['loc']['lon'],
+                    td2['start']['loc']['lat'])
+                distance_between_start_and_end = distance(
+                    start_ll[0], start_ll[1],
+                    end_ll[0], end_ll[1])
+                start_time = td1['end']['time']
+                end_time   = td2['start']['time']
+
+                if distance_between_start_and_end < MIN_DISTANCE_BETWEEN_STOPS:
+                    return [Stop(
+                        vehicle = vehicle,
+                        start_time = start_time,
+                        end_time = end_time,
+                        lon = start_ll[0],
+                        lat = start_ll[1])]
+                else:
+                    return [
+                        Stop(
+                            vehicle = vehicle,
+                            start_time = start_time,
+                            lon = start_ll[0],
+                            lat = start_ll[1]),
+                        Stop(
+                            vehicle = vehicle,
+                            end_time = end_time,
+                            lon = end_ll[0],
+                            lat = end_ll[1])]
+
+            def gen_trips(ss1, ss2):
+                return Trip(
+                    vehicle = vehicle,
+                    start   = ss1[0] if len(ss1) == 1 else ss1[1],
+                    end     = ss1[0])
+
+            def gen_traversals(result, trip):
+                speeds =  _average_speed(rego, result)
+                if speeds is None:
+                    return None
+
+                return [Traversal(
+                    vehicle = vehicle,
+                    edge    = str(line['edge_id']),
+                    hour    = line['hour'],
+                    weekday = line['weekDay'],
+                    speed   = line['speed'],
+                    count   = line['weight']) for index, line in speeds.iterrows()]
+
+            results = [run_trip(trip, ti) for ti, trip in enumerate(trips)]
+
+            # stops
+            s0 = Stop(vehicle=vehicle, end_time=results[0][0]['start']['time'])
+            sn = Stop(vehicle=vehicle, end_time=results[-1][0]['end']['time'])
+            stops  = [[s0]] + [gen_stops(td1[0], td2[0]) for td1, td2 in zip(
+                results[:-1], results[1:])] + [[sn]]
+
+            # trips
+            trips = [gen_trips(ss1, ss2) for ss1, ss2 in zip(
+                stops[:-1], stops[1:])]
+
+            # traversals
+            traversals = [t for t in (gen_traversals(r[1], tr) for r, tr in zip(
+                results, trips)) if t is not None]
+
+            write_to_db(vehicle, base, stops, trips, traversals)
+            json.dump([r[0] for r in results], seqfile)
 
     except Exception as e:
         logger.exception('processing {} failed...'.format(rego))
@@ -256,10 +314,10 @@ def _process_files(fns):
         else:
             base, trips = rawfiles2jsonchunks(input_files, True)
 
-        if base is not None:
-            _base_to_db(rego, base[0], base[1])
+        vehicle = Vehicle(rego = rego)
+        base = Base(vehicle = vehicle, lon=base[0], lat=base[1])
 
-        _process_trips(rego, trips, seq_file_name)
+        _process_trips(rego, trips, seq_file_name, vehicle, base)
 
     except EmptyCellsException as e:
         raise Exception('failed to locate base ({}) for: {}'.format(

@@ -17,7 +17,8 @@ from ..settings import (
     OUT_PATH,
     STOP_PATH,
     SRC_DEST_PATH,
-    BOUNDARIES_PATH)
+    BOUNDARIES_PATH,
+    MIN_DISTANCE_BETWEEN_STOPS)
 from ._valhalla import MatchToNetwork
 
 logger = logging.getLogger(__name__)
@@ -32,10 +33,6 @@ if os.path.exists(_geom_fields_map_path):
         GEOM_ID_COLUMN = json.load(f)
 else:
     GEOM_ID_COLUMN = {}
-
-#: Distance in meters between two points for them to be considered itdentical
-#: with respect to the end of one trip and the beginning of the next.
-MAGIC_DISTANCE = 50
 
 #: Timezone for Vietnam.
 TZ             = timezone(timedelta(hours=7), 'ITC')
@@ -63,7 +60,7 @@ def _ends(end, start):
     x0, y0 =   end['lon'],     end['lat']
     d = distance(x0, y0, x1, y1)
     yield x0, y0
-    if d > MAGIC_DISTANCE:
+    if d > MIN_DISTANCE_BETWEEN_STOPS:
         yield x1, y1
 
 def _do_stops(filename):
@@ -89,7 +86,7 @@ def _do_stops(filename):
         t0 = t1
     p0 = t0['start']['loc']
     p1 = t0['end']['loc']
-    if distance(p0['lon'], p0['lat'], p1['lon'], p1['lat']) > MAGIC_DISTANCE:
+    if distance(p0['lon'], p0['lat'], p1['lon'], p1['lat']) > MIN_DISTANCE_BETWEEN_STOPS:
         yield p1['lon'], p1['lat']
 
 def _do_source_dest(filename):

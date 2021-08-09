@@ -58,6 +58,10 @@ MIN_MOVING_SPEED  = 6
 #: GPS points to not be considered 'moving' in meters.
 MIN_MOVE_DISTANCE = 50
 
+#: The distance between two stops below which they are considered to be the same
+#: location.
+MIN_DISTANCE_BETWEEN_STOPS = 50
+
 #: Radius of the Earth in meters.
 EARTH_RADIUS      = 6371000
 
