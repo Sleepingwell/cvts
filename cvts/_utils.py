@@ -40,32 +40,36 @@ def _trip_slices(locs):
     """Generator over sequential slices of *locs* that form trips."""
 
     if len(locs) == 0:
-        yield slice(0, 0)
+        yield locs
 
     else:
-        getter = lambda l: (l['time'], l['speed'], l['lat'], l['lon'])
-        zi = enumerate(getter(l) for l in locs)
-        li, (last_moved_time, _, ly, lx) = next(zi)
+        getter = lambda l: (l['time'], l['speed'], l['lat'], l['lon'], l)
+        zi = (getter(l) for l in locs)
+        last_moved_time, _, ly, lx, loc = next(zi)
         last_point_time = last_moved_time
-        i = li
 
-        for i, (t, s, y, x) in zi:
+        next_chunk = [loc]
+        for t, s, y, x, loc in zi:
             has_moved = s > MIN_MOVING_SPEED or distance(lx, ly, x, y) > MIN_MOVE_DISTANCE
 
             if has_moved:
                 if t - last_moved_time > MIN_STOP_TIME:
                     if t - last_point_time <= MIN_STOP_TIME:
-                        yield slice(li, i-1)
-                        li = i-1
+                        yield next_chunk
+                        next_chunk = [loc]
                     else:
-                        yield slice(li, i)
-                        li = i
+                        yield next_chunk
+                        next_chunk = [loc]
+
+                else:
+                    next_chunk.append(loc)
+
                 lx, ly, last_moved_time = x, y, t
 
             last_point_time = t
 
-        # TODO: Should we be doing this only when vehicle has moved?
-        yield slice(li, i+1)
+        if len(next_chunk):
+            yield next_chunk
 
 
 
@@ -93,8 +97,7 @@ def _prepjson(locs, split_trips):
 
     locs.sort(key=lambda l: l['time'])
     if split_trips:
-        for split in _trip_slices(locs):
-            clocs = locs[split]
+        for clocs in _trip_slices(locs):
             if len(clocs) == 0:
                 continue
             clocs[0]['type'] = 'break'
