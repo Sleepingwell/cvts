@@ -9,10 +9,14 @@ setup(
     python_requires='>=3',
     packages=find_packages(),
     scripts=[
+        'bin/anonymizeregos',
+        'bin/collectionnames',
+        'bin/createpgdb',
         'bin/csv2json',
         'bin/json2geojson',
-        'bin/regioncounts',
-        'bin/speed'],
+        'bin/processall',
+        'bin/processtraces',
+        'bin/testmongoconnection'],
     install_requires=[
         'dataclasses',
         'luigi',
@@ -20,11 +24,16 @@ setup(
         'numpy',
         'pandas',
         'pyshp',
+        'psycopg2-binary', # couldn't get 'non-binary' to install.
         'scipy',
         'shapely',
+        'sqlalchemy',
         'tqdm'],
     extras_require={
         "dev": [
+            "ipython",
             "sphinx",
-            "sphinx-autodoc-typehints"]}
+            "sphinx-autodoc-typehints"],
+        "mongo": [
+            "pymongo"]}
 )

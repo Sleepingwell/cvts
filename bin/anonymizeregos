@@ -11,15 +11,14 @@
 #------------------------------------------------------------------------------
 
 import os
-import logging
 import pickle
 from hashlib import sha256 as _hasher
 import pandas as pd
 import luigi
-from cvts.settings import ANON_RAW_PATH, RAW_PATH
+from cvts.settings import ANON_RAW_PATH, RAW_PATH, setup_logging
 from cvts.tasks import ListRawFiles
 
-logging.basicConfig(level=logging.INFO)
+setup_logging()
 
 def hasher(rego):
     to_hash = '{}{}'.format(rego, salt).encode('utf-8')

@@ -1,4 +1,6 @@
 import os
+import logging
+from datetime import datetime as dt
 
 def _bool_from_env(ev):
     return os.environ.get(ev, 'False') not in ('0', 'False')
@@ -13,6 +15,36 @@ if _building:
     # Sphinx puts the path in the documentation... so make it the default.
     # if we don't do it here, it gets expanded when setting WORK_PATH below.
     os.environ['CVTS_WORK_PATH'] = '~/.cvts'
+
+    #---------------------------------------------------------------------------
+    #                            *****IMPORTANT*****
+    # Set these to None because they may contain passwords.
+    #---------------------------------------------------------------------------
+    os.environ.pop('CVTS_MONGO_CONNECTION_STRING', None)
+    os.environ.pop('CVTS_POSTGRES_CONNECTION_STRING', None)
+
+#: The connections string for MongoDB. If present, raw data is read from this
+#: DB. Read from the environment variable *CVTS_MONGO_CONNECTION_STRING*.
+MONGO_CONNECTION_STRING = os.environ.get('CVTS_MONGO_CONNECTION_STRING', None)
+
+#: The connections string for PostGRE. Read from the environment variable
+#: *CVTS_POSTGRES_CONNECTION_STRING*.
+POSTGRES_CONNECTION_STRING = os.environ.get('CVTS_POSTGRES_CONNECTION_STRING', None)
+
+#: Are we reading raw data from MongoDB. ``True`` if the environment variable
+#: *MONGO_CONNECTION_STRING* is set.
+RAW_FROM_MONGO = MONGO_CONNECTION_STRING is not None
+
+_raw_dir_must_exist = not (
+    RAW_FROM_MONGO \
+    or _building \
+    or _initial_setup_and_test)
+
+#: The collections to limit ourselves to in the MongoDB.
+MONGO_COLLECTION_NAMES = None
+
+#! The number of documents to process if in DEBUG mode.
+DEBUG_DOC_LIMIT   = 10000
 
 #: The minimum time a vehicle must not move for to be considered 'stopped' in
 #: seconds.
@@ -50,7 +82,7 @@ WORK_PATH       = os.environ.get(
     'CVTS_WORK_PATH', os.path.join(os.path.expanduser("~"), '.cvts'))
 
 #: Root directory for :doc:`input files<input>`.
-RAW_PATH        = _get_path('raw', not (_building or _initial_setup_and_test))
+RAW_PATH        = _get_path('raw', _raw_dir_must_exist)
 
 #: Root directory for anonymized :doc:`input files<input>`. These are generated
 #: by the script
@@ -87,6 +119,14 @@ if not _building:
     for p in (ANON_RAW_PATH, CONFIG_PATH, OUT_PATH, SEQ_PATH, MM_PATH, STOP_PATH, SRC_DEST_PATH, SPEED_PATH):
         if not os.path.exists(p):
             os.makedirs(p)
+
+# basic logging setup
+def setup_logging(level=logging.DEBUG if DEBUG else logging.INFO):
+    logging.basicConfig(level=level)
+    fileHandler = logging.FileHandler(os.path.join(OUT_PATH, "run-{}.log".format(
+        dt.now().isoformat().replace(':', '-').replace('.', '-'))))
+    rootLogger = logging.getLogger()
+    rootLogger.addHandler(fileHandler)
 
 if __name__ == '__main__':
     # this won't work on windows

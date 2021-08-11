@@ -1,20 +1,22 @@
 import os
 import pickle
 import logging
+import csv
 from glob import glob
 from multiprocessing import Pool
+from pathlib import Path
 import numpy as np
 import pandas as pd
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 from tqdm import tqdm
 import luigi
-from cvts.settings import OUT_PATH, SPEED_PATH
+from cvts.settings import (
+    OUT_PATH,
+    SPEED_PATH,
+    POSTGRES_CONNECTION_STRING)
+from ..models import Traversal
 from ._valhalla import MatchToNetwork
-
-
-
-logger = logging.getLogger(__name__)
-
-
 
 AVE_SPEED_FILE = 'ave_speeds.pkl'
 
@@ -68,6 +70,36 @@ def _process_file(filename):
 
 
 
+_engine = create_engine(POSTGRES_CONNECTION_STRING)
+_session_maker = None
+def _engine_dispose():
+    # to be called from the pools initialiser
+    # see: https://docs.sqlalchemy.org/en/13/core/pooling.html#pooling-multiprocessing
+    global _engine, _session_maker
+    _engine.dispose()
+    _session_maker = sessionmaker(bind=_engine)
+
+def _trips_to_db(trip_file_name):
+    global _session_maker
+    rego    = os.path.splitext(os.path.basename(trip_file_name))[0].split('-')[0]
+    session = _session_maker()
+
+    with open(trip_file_name, 'r') as csvfile:
+        speeds = csv.DictReader(csvfile)
+        for line in speeds:
+            traversal = Traversal(
+                rego    = rego,
+                way     = line['way_id'],
+                hour    = line['hour'],
+                weekday = line['weekDay'],
+                speed   = line['speed'],
+                weight  = line['weight'])
+            session.add(traversal)
+    session.commit()
+
+#-------------------------------------------------------------------------------
+# Luigi tasks
+#-------------------------------------------------------------------------------
 class AverageSpeed(luigi.Task):
     """Collects all the stop points for all trips of all vehicles."""
 
@@ -84,13 +116,36 @@ class AverageSpeed(luigi.Task):
 
         with Pool() as p:
             workers = p.imap_unordered(_process_file, mm_files)
-            for i in tqdm(workers, total=len(mm_files)): pass
+            list(tqdm(workers, total=len(mm_files)))
 
         with open(self.output().fn, 'wb') as of:
-            output_files = glob(os.path.join(SPEED_PATH, '*'))
+            output_files = glob(os.path.join(SPEED_PATH, '*-speed.csv'))
             with open(self.output().fn, 'wb') as pf:
                 pickle.dump(output_files, pf)
 
     def output(self):
         """:meta private:"""
         return luigi.LocalTarget(self.pickle_file_name)
+
+
+
+
+class TripsToDB(luigi.Task):
+    def requires(self):
+        """:meta private:"""
+        return AverageSpeed()
+
+    def run(self):
+        """:meta private:"""
+        with open(self.input().fn, 'rb') as sf:
+            all_seq_files = pickle.load(sf)
+
+        with Pool(initializer=_engine_dispose) as p:
+            workers = p.imap_unordered(_trips_to_db, all_seq_files)
+            list(tqdm(workers, total=len(all_seq_files)))
+
+        Path(self.output().fn).touch()
+
+    def output(self):
+        """:meta private:"""
+        return luigi.LocalTarget(os.path.join(OUT_PATH, 'db_dumped'))

@@ -5,6 +5,7 @@ from ._shapes import read_shapefile
 from ._utils import (
     distance,
     rawfiles2jsonchunks,
+    mongodoc2jsonchunks,
     rawfiles2jsonfile,
     json2geojson,
     jsonfile2geojsonfile)

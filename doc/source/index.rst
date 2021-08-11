@@ -48,3 +48,6 @@ different on how they are used more generally.
 
     trip
         A journey between two :term:`stop points<stop point>`.
+
+    way id
+        Identifiers for road segments (as defined in Open Stree Map).

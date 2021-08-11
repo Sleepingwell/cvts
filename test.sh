@@ -37,8 +37,8 @@ valhalla_build_tiles -c valhalla.json vietnam-latest.osm.pbf
 #tar it up for running the server
 find valhalla_tiles | sort -n | tar cf valhalla_tiles.tar --no-recursion -T -
 
-# go back to initial directory
-popd
+# go to the test directory
+popd; pushd test
 
 # convert the test CSV data to JSON
 bin/csv2json test.csv test.json 0
