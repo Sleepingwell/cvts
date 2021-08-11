@@ -22,7 +22,6 @@ from ..settings import (
     DEBUG_DOC_LIMIT,
     RAW_PATH,
     OUT_PATH,
-    MM_PATH,
     SEQ_PATH,
     MONGO_CONNECTION_STRING,
     POSTGRES_CONNECTION_STRING,
@@ -167,7 +166,7 @@ def _average_speed(rego, results):
 
 
 
-def _process_trips(rego, trips, mm_file_name, seq_file_name):
+def _process_trips(rego, trips, seq_file_name):
     def run_trip(trip, trip_index):
         try:
             trip_data = {
@@ -189,7 +188,7 @@ def _process_trips(rego, trips, mm_file_name, seq_file_name):
             except:
                 raise Exception('valhalla failure')
 
-            # convert the output from Valhalla into our outputs (seq and mm files).
+            # convert the output from Valhalla into our outputs (seq files).
             edges = snapped['edges']
             match_props = ((p.get('edge_index'), p['type']) for p in snapped['matched_points'])
             trip_data['edge_to_osmids'] = {e['id']:e['osmids'] for e in edges}
@@ -210,18 +209,11 @@ def _process_trips(rego, trips, mm_file_name, seq_file_name):
                 (e_str,) for p in trip['shape']]
 
     try:
-        with open(mm_file_name, 'w') as mmfile, open(seq_file_name , 'w') as seqfile:
-
-            # write the header (to the mm file)
-            mmfile.write(','.join(MM_KEYS) + '\n')
-
-            # write a trip (to the mm file)
+        with open(seq_file_name , 'w') as seqfile:
             def write_trips(trip_desc, result):
                 speeds = _average_speed(rego, result)
                 if speeds is not None:
                     _trips_to_db(rego, speeds)
-                mmfile.writelines('{}\n'.format(
-                    ','.join(str(t) for t in tup)) for tup in result)
                 return trip_desc
 
             results = (run_trip(trip, ti) for ti, trip in enumerate(trips))
@@ -248,10 +240,9 @@ def _process_files(fns):
     else:
         rego = os.path.splitext(fn)[0]
 
-    mm_file_name  = os.path.join(MM_PATH,  '{}.csv'.format(rego))
     seq_file_name = os.path.join(SEQ_PATH, '{}.json'.format(rego))
 
-    if os.path.exists(mm_file_name) and os.path.exists(seq_file_name):
+    if os.path.exists(seq_file_name):
         logger.debug('skipping: {} (done)'.format(rego))
         return
 
@@ -308,7 +299,6 @@ class MatchToNetwork(luigi.Task):
     """Match trips to the network."""
 
     pickle_file_name = os.path.join(OUT_PATH, 'seq_files.pkl')
-    mm_file_name     = os.path.join(OUT_PATH, 'mm_files.pkl')
 
     def requires(self):
         """:meta private:"""
@@ -333,16 +323,9 @@ class MatchToNetwork(luigi.Task):
 
         # list the (seq) output files
         seq_output_files = glob(os.path.join(SEQ_PATH, '*'))
-        with open(self.output()['seq'].fn, 'wb') as pf:
+        with open(self.output().fn, 'wb') as pf:
             pickle.dump(seq_output_files, pf)
-
-        # list the (mm) output files
-        mm_output_files = glob(os.path.join(MM_PATH, '*'))
-        with open(self.output()['mm'].fn, 'wb') as pf:
-            pickle.dump(mm_output_files, pf)
 
     def output(self):
         """:meta private:"""
-        return {
-            'seq': luigi.LocalTarget(self.pickle_file_name),
-            'mm' : luigi.LocalTarget(self.mm_file_name)}
+        return luigi.LocalTarget(self.pickle_file_name)
