@@ -9,7 +9,7 @@ KERNEL = [[0.5, 0.5, 0.5],
           [0.5, 1.0, 0.5],
           [0.5, 0.5, 0.5]]
 
-TARGET_CELL_SIZE_IN_DEG = 0.003
+TARGET_CELL_SIZES_IN_DEG = (.5, .05, .003)
 
 
 
@@ -22,50 +22,56 @@ def locate_base(lons, lats, speeds,
         maxlat = MAXLAT,
         minlon = MINLON,
         maxlon = MAXLON,
-        cellsize = TARGET_CELL_SIZE_IN_DEG,
+        cellsizes = TARGET_CELL_SIZES_IN_DEG,
         maxspeed = 1.):
 
-    rows = None
-    cols = None
     lats = np.array(lats)
     lons = np.array(lons)
-    conds = np.all(np.array([
-        np.array(speeds) <= maxspeed,
-        lats > minlat,
-        lats < maxlat,
-        lons > minlon,
-        lons < maxlon]), axis=0)
-    lats = np.array(lats)[conds]
-    lons = np.array(lons)[conds]
+    valid_lls = np.array(speeds) <= maxspeed
+    lats = np.array(lats)[valid_lls]
+    lons = np.array(lons)[valid_lls]
 
-    g = Grid(
-        minlat   = minlat,
-        minlon   = minlon,
-        maxlat   = maxlat,
-        maxlon   = maxlon,
-        cellsize = cellsize)
+    # we loop to try and keep the amount of memory allocated in the grid to
+    # something that will be manageable everywhere.
+    for cellsize in cellsizes:
+        g = Grid(
+            minlat   = minlat,
+            minlon   = minlon,
+            maxlat   = maxlat,
+            maxlon   = maxlon,
+            cellsize = cellsize)
 
-    rowcols = g.increment_many(lons, lats)
+        rowcols, lons, lats = g.increment_many(lons, lats)
 
-    convolved = g.convolve(KERNEL)
-    largest_index = np.unravel_index(np.argmax(convolved), convolved.shape)
+        if len(lats) == 0:
+            raise EmptyCellsException('no latitudes left')
+        if len(lons) == 0:
+            raise EmptyCellsException('no longitudes left')
 
-    rows = np.arange(largest_index[0]-1, largest_index[0]+2)
-    rows = rows[np.all(np.vstack((0 <= rows, rows < convolved.shape[0])), 0)]
+        c = g.convolve(KERNEL)
+        largest_index = np.unravel_index(np.argmax(c), c.shape)
 
-    cols = np.arange(largest_index[1]-1, largest_index[1]+2)
-    cols = cols[np.all(np.vstack((0 <= cols, cols < convolved.shape[1])), 0)]
+        rows = np.arange(largest_index[0]-1, largest_index[0]+2)
+        rows = rows[np.all(np.vstack((0 <= rows, rows < c.shape[0])), 0)]
 
-    inds = np.all([
-        np.in1d(rowcols[:,0], rows),
-        np.in1d(rowcols[:,1], cols)], 0)
+        cols = np.arange(largest_index[1]-1, largest_index[1]+2)
+        cols = cols[np.all(np.vstack((0 <= cols, cols < c.shape[1])), 0)]
 
-    lats = lats[inds]
-    lons = lons[inds]
+        inds = np.all(np.vstack((
+            np.in1d(rowcols[:,0], rows),
+            np.in1d(rowcols[:,1], cols))), axis=0)
 
-    if len(lats) == 0:
-        raise EmptyCellsException('no latitudes left')
-    if len(lons) == 0:
-        raise EmptyCellsException('no longitudes left')
+        lons = lons[inds]
+        lats = lats[inds]
 
-    return np.mean(lons), np.mean(lats)
+        meanlon, meanlat = np.mean(lons), np.mean(lats)
+
+        if cellsize > cellsizes[-1]:
+            # centers the cells on the average of what's left
+            minlat = meanlat - 2.0 * cellsize
+            maxlat = meanlat + 2.0 * cellsize
+            minlon = meanlon - 2.0 * cellsize
+            maxlon = meanlon + 2.0 * cellsize
+
+        else:
+            return meanlon, meanlat

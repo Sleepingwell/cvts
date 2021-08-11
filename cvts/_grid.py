@@ -39,8 +39,12 @@ class Grid:
         self.minlon = minlon
         self.cellsize = cellsize
         self.na_value = na_value
-        self.ncol = int(ceil((maxlon - self.minlon) / self.cellsize))
-        self.nrow = int(ceil((maxlat - self.minlat) / self.cellsize))
+        self.ncol = int(ceil((maxlon - minlon) / self.cellsize))
+        self.nrow = int(ceil((maxlat - minlat) / self.cellsize))
+        self.minlat = minlat
+        self.minlon = minlon
+        self.maxlat = minlat + self.nrow * cellsize
+        self.maxlon = minlon + self.ncol * cellsize
         self.cells = np.zeros((self.nrow, self.ncol), int)
 
     def increment(self, lon, lat):
@@ -60,6 +64,13 @@ class Grid:
         Should be much more efficient than using :py:meth:`Grid.increment`
         repeatedly.
         """
+        valid_lls = np.all(np.vstack((
+            lats > self.minlat, lats < self.maxlat,
+            lons > self.minlon, lons < self.maxlon)), axis=0)
+
+        lons = lons[valid_lls]
+        lats = lats[valid_lls]
+
         row_cols = np.array([
             self.nrow - (np.floor((lats - self.minlat) / self.cellsize)) - 1,
                         (np.floor((lons - self.minlon) / self.cellsize))],
@@ -67,7 +78,8 @@ class Grid:
 
         indexes, counts = np.unique(row_cols, return_counts=True, axis=1)
         self.cells[indexes[0,:],indexes[1,:]] += counts
-        return row_cols.T
+
+        return row_cols.T, lons, lats
 
     def convolve(self, kernel):
         return convolve(self.cells, kernel)
