@@ -111,9 +111,8 @@ def write_to_db(vehicle, base, stops, trips, traversals):
     session = _session_maker()
     session.add(vehicle)
     session.add(base)
-    for ss in stops:
-        for stop in ss:
-            session.add(stop)
+    for stop in stops:
+        session.add(stop)
     for trip in trips:
         session.add(trip)
     for ts in traversals:
@@ -207,7 +206,7 @@ def _process_trips(rego, trips, seq_file_name, vehicle, base):
     try:
         with open(seq_file_name , 'w') as seqfile:
 
-            def gen_stops(td1, td2):
+            def gen_stops(td1, td2, n_stationary):
                 start_ll = (
                     td1['end']['loc']['lon'],
                     td1['end']['loc']['lat'])
@@ -220,31 +219,22 @@ def _process_trips(rego, trips, seq_file_name, vehicle, base):
                 start_time = td1['end']['time']
                 end_time   = td2['start']['time']
 
-                if distance_between_start_and_end < MIN_DISTANCE_BETWEEN_STOPS:
-                    return [Stop(
-                        vehicle = vehicle,
-                        start_time = start_time,
-                        end_time = end_time,
-                        lon = start_ll[0],
-                        lat = start_ll[1])]
-                else:
-                    return [
-                        Stop(
-                            vehicle = vehicle,
-                            start_time = start_time,
-                            lon = start_ll[0],
-                            lat = start_ll[1]),
-                        Stop(
-                            vehicle = vehicle,
-                            end_time = end_time,
-                            lon = end_ll[0],
-                            lat = end_ll[1])]
+                return Stop(
+                    vehicle = vehicle,
+                    start_time = start_time,
+                    end_time = end_time,
+                    n_stationary = n_stationary,
+                    start_end_dist = distance_between_start_and_end,
+                    start_lon = start_ll[0],
+                    start_lat = start_ll[1],
+                    end_lon = end_ll[0],
+                    end_lat = end_ll[1])
 
-            def gen_trips(ss1, ss2):
+            def gen_trips(stop1, stop2):
                 return Trip(
                     vehicle = vehicle,
-                    start   = ss1[0] if len(ss1) == 1 else ss1[1],
-                    end     = ss1[0])
+                    start   = stop1,
+                    end     = stop2)
 
             def gen_traversals(result, trip):
                 speeds =  _average_speed(rego, result)
@@ -260,16 +250,27 @@ def _process_trips(rego, trips, seq_file_name, vehicle, base):
                     speed   = line['speed'],
                     count   = line['weight']) for index, line in speeds.iterrows()]
 
-            results = [run_trip(trip, ti) for ti, trip in enumerate(trips)]
+            results = [(run_trip(trip, ti), n_stationary) for \
+                    ti, (n_stationary, trip) in enumerate(trips)]
 
+            n_stationary = [r[1] for r in results]
+            results = [r[0] for r in results]
             # stops
-            s0 = Stop(vehicle=vehicle, end_time=results[0][0]['start']['time'])
-            sn = Stop(vehicle=vehicle, end_time=results[-1][0]['end']['time'])
-            stops  = [[s0]] + [gen_stops(td1[0], td2[0]) for td1, td2 in zip(
-                results[:-1], results[1:])] + [[sn]]
+            s0 = Stop(
+                vehicle    = vehicle,
+                end_time   = results[0][0]['start']['time'],
+                end_lon    = results[0][0]['start']['loc']['lon'],
+                end_lat    = results[0][0]['start']['loc']['lat'])
+            sn = Stop(
+                vehicle    = vehicle,
+                start_time = results[-1][0]['end']['time'],
+                start_lon  = results[-1][0]['end']['loc']['lon'],
+                start_lat  = results[-1][0]['end']['loc']['lat'])
+            stops  = [s0] + [gen_stops(td1[0], td2[0], ns) for td1, td2, ns in zip(
+                results[:-1], results[1:], n_stationary[1:])] + [sn]
 
             # trips
-            trips = [gen_trips(ss1, ss2) for ss1, ss2 in zip(
+            trips = [gen_trips(s1, s2) for s1, s2 in zip(
                 stops[:-1], stops[1:])]
 
             # traversals

@@ -46,30 +46,38 @@ def _trip_slices(locs):
         getter = lambda l: (l['time'], l['speed'], l['lat'], l['lon'], l)
         zi = (getter(l) for l in locs)
         last_moved_time, _, ly, lx, loc = next(zi)
-        last_point_time = last_moved_time
+        next_chunk        = [loc]
+        stationary_points = []
 
-        next_chunk = [loc]
         for t, s, y, x, loc in zi:
             has_moved = s > MIN_MOVING_SPEED or distance(lx, ly, x, y) > MIN_MOVE_DISTANCE
 
             if has_moved:
                 if t - last_moved_time > MIN_STOP_TIME:
-                    if t - last_point_time <= MIN_STOP_TIME:
-                        yield next_chunk
-                        next_chunk = [loc]
+                    nsp = len(stationary_points)
+                    if nsp > 0:
+                        next_chunk.append(stationary_points[0])
+                        yield nsp, next_chunk
+                        next_chunk = [stationary_points[-1], loc]
+
                     else:
-                        yield next_chunk
+                        yield nsp, next_chunk
                         next_chunk = [loc]
 
                 else:
                     next_chunk.append(loc)
 
+                del stationary_points[:]
                 lx, ly, last_moved_time = x, y, t
 
-            last_point_time = t
+            else:
+                stationary_points.append(loc)
 
         if len(next_chunk):
-            yield next_chunk
+            nsp = len(stationary_points)
+            if nsp > 0:
+                next_chunk.append(stationary_points[0])
+            yield nsp, next_chunk
 
 
 
@@ -97,16 +105,17 @@ def _prepjson(locs, split_trips):
 
     locs.sort(key=lambda l: l['time'])
     if split_trips:
-        for clocs in _trip_slices(locs):
+        for n_stationary, clocs in _trip_slices(locs):
             if len(clocs) == 0:
                 continue
             clocs[0]['type'] = 'break'
             clocs[-1]['type'] = 'break'
-            yield {'shape': clocs, 'costing': 'auto', 'shape_match': 'map_snap'}
+            yield n_stationary, {'shape': clocs, 'costing': 'auto', 'shape_match': 'map_snap'}
+
     else:
         locs[0]['type'] = 'break'
         locs[-1]['type'] = 'break'
-        yield {'shape': locs, 'costing': 'auto', 'shape_match': 'map_snap'}
+        yield 0, {'shape': locs, 'costing': 'auto', 'shape_match': 'map_snap'}
 
 
 
@@ -207,7 +216,7 @@ def rawfiles2jsonfile(
 
     _, chunks = rawfiles2jsonchunks(csv_file, False)
     with open(out_file, 'w') as jf:
-        json.dump(next(chunks), jf, indent=4)
+        json.dump(next(chunks)[1], jf, indent=4)
 
 
 

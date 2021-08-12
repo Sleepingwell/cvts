@@ -27,10 +27,14 @@ class Stop(DBase):
     id            = Column(Integer, primary_key=True)
     vehicle_id    = Column(Integer, ForeignKey('vehicles.id'))
     vehicle       = relationship('Vehicle', backref='stops')
+    n_stationary  = Column(Integer)
     start_time    = Column(Integer)
     end_time      = Column(Integer)
-    lat           = Column(Float)
-    lon           = Column(Float)
+    start_end_dist= Column(Float)
+    start_lat     = Column(Float)
+    start_lon     = Column(Float)
+    end_lat       = Column(Float)
+    end_lon       = Column(Float)
 
 class Trip(DBase):
     """The location a vehicle is garraged."""
