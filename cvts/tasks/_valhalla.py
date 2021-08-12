@@ -253,6 +253,7 @@ def _process_trips(rego, trips, seq_file_name, vehicle, base):
 
                 return [Traversal(
                     vehicle = vehicle,
+                    trip    = trip,
                     edge    = str(line['edge_id']),
                     hour    = line['hour'],
                     weekday = line['weekDay'],
