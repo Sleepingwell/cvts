@@ -1,6 +1,13 @@
 """Module providing an ORM for objects of interest."""
 
-from sqlalchemy import Column, Integer, String, Float, ForeignKey
+from sqlalchemy import (
+    Column,
+    BigInteger,
+    SmallInteger,
+    Integer,
+    String,
+    Float,
+    ForeignKey)
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -59,8 +66,8 @@ class Traversal(DBase):
     vehicle       = relationship('Vehicle', backref='traversals')
     trip_id       = Column(Integer, ForeignKey('trips.id'))
     trip          = relationship('Trip', backref='traversals')
-    edge          = Column(String)
-    hour          = Column(Integer)
-    weekday       = Column(Integer)
+    edge          = Column(BigInteger) # will be unsigned 64 bit int
+    hour          = Column(SmallInteger)
+    weekday       = Column(SmallInteger)
     speed         = Column(Float)
     count         = Column(Float)

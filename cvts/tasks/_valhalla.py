@@ -130,8 +130,7 @@ def _average_speed(rego, results):
     if df.shape[0] == 0:
         return None
 
-    # TODO: did I check that int32 was suitable?
-    df['edge_id'] = df['edge_id'].astype(np.int64)
+    df['edge_id'] = df['edge_id'].astype(np.uint64)
 
     # add date and hour
     dt = pd.to_datetime(df['time'], unit='s').dt
