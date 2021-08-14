@@ -41,6 +41,9 @@ valhalla_build_tiles -c valhalla.json vietnam-latest.osm.pbf
 # tar it up for running the server
 find valhalla_tiles | sort -n | tar cf valhalla_tiles.tar --no-recursion -T -
 
+# dump the edges and stuff
+valhalla_osm_network valhalla.json > vietnam-network.json
+
 # go to the test directory
 popd; pushd test
 
