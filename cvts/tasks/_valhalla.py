@@ -58,17 +58,25 @@ NAS = (NA_VALUE,) * len(EDGE_KEYS)
 
 
 
-def hasher(rego):
+def mangle_rego(rego):
+    """Mangle a name that can be easily used in a file name.
+
+    The strings produced in the anonymisation process contain characters that
+    are problematic in file names. The result of this function is much easier
+    to deal with.
+    """
     return _hasher(rego.encode('utf-8')).hexdigest()[:24]
 
 
 
 def _getpointattrs(point):
+    """Get output attributes from input point."""
     return tuple(point[k] for k in POINT_KEYS)
 
 
 
 def _getedgeattrs(edge):
+    """Get output attributes from a Valhalla edge."""
     return tuple(edge.get(k, NA_VALUE) for k in EDGE_KEYS)
 
 
@@ -115,9 +123,8 @@ def write_to_db(vehicle, base, stops, trips, traversals):
         session.add(stop)
     for trip in trips:
         session.add(trip)
-    for ts in traversals:
-        for traversal in ts:
-            session.add(traversal)
+    for traversal in traversals:
+        session.add(traversal)
     session.commit()
 
 
@@ -183,11 +190,12 @@ def _process_trips(rego, trips, seq_file_name, vehicle, base):
 
             # convert the output from Valhalla into our outputs (seq files).
             edges = snapped['edges']
-            match_props = ((p.get('edge_index'), p['type']) for p in snapped['matched_points'])
             trip_data['geojson'] = json2geojson(snapped, True)
             trip_data['edge_to_osmids'] = {e['id']:e['osmids'] for e in edges}
             trip_data['way_ids'] = [e['way_id'] for e in edges]
             trip_data['status'] = 'success'
+
+            match_props = ((p.get('edge_index'), p['type']) for p in snapped['matched_points'])
 
             return trip_data, [_getpointattrs(p) + \
                 ('success', trip_index) + \
@@ -274,8 +282,8 @@ def _process_trips(rego, trips, seq_file_name, vehicle, base):
                 stops[:-1], stops[1:])]
 
             # traversals
-            traversals = [t for t in (gen_traversals(r[1], tr) for r, tr in zip(
-                results, trips)) if t is not None]
+            traversals = [t for ms, ts, es in zip(mm, trips, edge_ids) \
+                for t in gen_traversals(ms, ts, es)]
 
             write_to_db(vehicle, base, stops, trips, traversals)
             json.dump([r[0] for r in results], seqfile)
@@ -294,7 +302,7 @@ def _process_files(fns):
 
     if isinstance(input_files, str):
         if input_files == MONGO_VALUE:
-            rego = hasher(fn)
+            rego = mangle_rego(fn)
         else:
             assert(fn.endswith('.csv'))
             rego = os.path.splitext(fn)[0]
