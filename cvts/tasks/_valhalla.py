@@ -321,7 +321,7 @@ def _process_files(fns):
         _process_trips(rego, trips, seq_file_name, vehicle, base)
 
     except EmptyCellsException as e:
-        raise Exception('failed to locate base ({}) for: {}'.format(
+        logger.warning('failed to locate base ({}) for: {}'.format(
             str(e), rego))
 
 
