@@ -220,38 +220,22 @@ def rawfiles2jsonfile(
 
 
 
-def json2geojson(data: Dict[str, Any]) -> Dict[str, Any]:
+def json2geojson(
+        data: Dict[str, Any],
+        shape_only: bool) -> Dict[str, Any]:
     """Convert the output from Valhalla to a GeoJSON object.
 
     On the command line, the call would look like::
-
 
         valhalla_service <config-file> trace_attributes <input-file>
 
     :param data: Output of a call to Valhalla (as described above).
 
+    :param shape_only: Should the returned GeoJSON only include the *shape*
+        element from *data*?
+
     :return: TODO
     """
-
-    edges = data['edges']
-
-    def _point_feature(matched_point, index):
-        lat = matched_point.pop('lat')
-        lon = matched_point.pop('lon')
-
-        edge_index = matched_point.get('edge_index')
-        matched_point['point_index'] = index
-        if edge_index is not None:
-            names = ', '.join(edges[edge_index].get("names", ["NA"]))
-            matched_point['osmnames'] = names
-            matched_point['way_id'] = edges[edge_index].get("way_id", "NA")
-
-        return {
-            'type': 'Feature',
-            'properties': matched_point,
-            'geometry': {
-                'type': 'Point',
-                'coordinates': [lon, lat]}}
 
     shape = [{
         'type': 'Feature',
@@ -259,12 +243,37 @@ def json2geojson(data: Dict[str, Any]) -> Dict[str, Any]:
             'type': 'LineString',
             'coordinates': [[p[0]/10., p[1]/10.] for p in decode(data['shape'])]}}]
 
+    if shape_only:
+        return {'type': 'FeatureCollection', 'features': shape}
+
+    else:
+        edges = data['edges']
+
+        def _point_feature(matched_point, index):
+            lat = matched_point.pop('lat')
+            lon = matched_point.pop('lon')
+
+            edge_index = matched_point.get('edge_index')
+            matched_point['point_index'] = index
+            if edge_index is not None:
+                names = ', '.join(edges[edge_index].get("names", ["NA"]))
+                matched_point['osmnames'] = names
+                matched_point['way_id'] = edges[edge_index].get("way_id", "NA")
+
+            return {
+                'type': 'Feature',
+                'properties': matched_point,
+                'geometry': {
+                    'type': 'Point',
+                    'coordinates': [lon, lat]}}
+
     return {
         'type': 'FeatureCollection',
-        'features': [_point_feature(mp, i) for i, mp in enumerate(data['matched_points'])] + shape}
+        'features': [_point_feature(mp, i) for i, mp in \
+                enumerate(data['matched_points'])] + shape}
 
 
 
 def jsonfile2geojsonfile(infile, outfile):
     with open(infile, 'r') as jf, open(outfile, 'w') as gf:
-        json.dump(json2geojson(json.load(jf)), gf, indent=4)
+        json.dump(json2geojson(json.load(jf), False), gf, indent=4)

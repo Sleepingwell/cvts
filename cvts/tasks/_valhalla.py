@@ -184,6 +184,7 @@ def _process_trips(rego, trips, seq_file_name, vehicle, base):
             # convert the output from Valhalla into our outputs (seq files).
             edges = snapped['edges']
             match_props = ((p.get('edge_index'), p['type']) for p in snapped['matched_points'])
+            trip_data['geojson'] = json2geojson(snapped, True)
             trip_data['edge_to_osmids'] = {e['id']:e['osmids'] for e in edges}
             trip_data['way_ids'] = [e['way_id'] for e in edges]
             trip_data['status'] = 'success'
