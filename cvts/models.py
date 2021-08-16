@@ -67,7 +67,6 @@ class Traversal(DBase):
     trip_id       = Column(Integer, ForeignKey('trips.id'))
     trip          = relationship('Trip', backref='traversals')
     edge          = Column(BigInteger) # will be unsigned 64 bit int
-    hour          = Column(SmallInteger)
-    weekday       = Column(SmallInteger)
+    timestamp     = Column(Integer)
     speed         = Column(Float)
     count         = Column(Float)

@@ -53,7 +53,7 @@ NA_VALUE = 'NA'
 POINT_KEYS = ('lat', 'lon', 'time', 'heading', 'speed', 'heading_tolerance')
 EDGE_KEYS = ('id', 'speed', 'speed_limit')
 EDGE_ATTR_NAMES = ('edge_id', 'valhalla_speed', 'speed_limit')
-MM_KEYS = POINT_KEYS + ('status', 'trip_index') + EDGE_ATTR_NAMES + ('message',)
+MM_KEYS = POINT_KEYS + ('status', 'trip_index') + EDGE_ATTR_NAMES + ('edge_index', 'message')
 NAS = (NA_VALUE,) * len(EDGE_KEYS)
 
 
@@ -139,24 +139,17 @@ def _average_speed(rego, results):
 
     df['edge_id'] = df['edge_id'].astype(np.uint64)
 
-    # add date and hour
-    dt = pd.to_datetime(df['time'], unit='s').dt
-    df['hour']    = dt.hour
-    df['weekDay'] = dt.weekday
-
     # average speed
     def ave_speed(df):
-        # average for each trip
-        tmp = df.groupby('trip_index').agg({'speed': ['mean', 'size']})
-
-        # average for the edge_id/hour/weekDay
         return pd.Series({
-            'speed' : np.average(tmp[('speed', 'mean')], weights=tmp[('speed', 'size')]),
-            'weight': np.sum(tmp[('speed', 'size')])})
+            'edge_id'  : df['edge_id'].iloc[0],
+            'speed'    : np.average(df['speed']),
+            'weight'   : df.shape[0],
+            'timestamp': int(np.average(df['time']))})
 
     #TODO: Do we want to check 'valhalla_speed' also/instead
     speed = df[df.speed > 6].groupby(
-        ['edge_id', 'hour', 'weekDay']).apply(ave_speed).reset_index()
+        ['edge_index']).apply(ave_speed).reset_index()
 
     if len(speed) != 0:
         speed["rego"] = rego
@@ -200,7 +193,7 @@ def _process_trips(rego, trips, seq_file_name, vehicle, base):
             return trip_data, [_getpointattrs(p) + \
                 ('success', trip_index) + \
                 (_getedgeattrs(edges[ei]) if ei is not None else NAS) + \
-                (mt,) for p, (ei, mt) in zip(trip['shape'], match_props)]
+                (ei, mt,) for p, (ei, mt) in zip(trip['shape'], match_props)]
 
         except Exception as e:
             e_str = '{}: {}'.format(e.__class__.__name__, str(e))
@@ -209,7 +202,7 @@ def _process_trips(rego, trips, seq_file_name, vehicle, base):
             return trip_data, [_getpointattrs(p) + \
                 ('failure', trip_index) + \
                 NAS + \
-                (e_str,) for p in trip['shape']]
+                (NA_VALUE, e_str) for p in trip['shape']]
 
     try:
         with open(seq_file_name , 'w') as seqfile:
@@ -252,30 +245,31 @@ def _process_trips(rego, trips, seq_file_name, vehicle, base):
                 return [Traversal(
                     vehicle = vehicle,
                     trip    = trip,
-                    edge    = str(line['edge_id']),
-                    hour    = line['hour'],
-                    weekday = line['weekDay'],
+                    edge    = line['edge_id'],
+                    timestamp = line['timestamp'],
                     speed   = line['speed'],
                     count   = line['weight']) for index, line in speeds.iterrows()]
 
             results = [(run_trip(trip, ti), n_stationary) for \
                     ti, (n_stationary, trip) in enumerate(trips)]
 
-            n_stationary = [r[1] for r in results]
-            results = [r[0] for r in results]
+            n_stationary = [r[1]    for r in results]
+            trip_data    = [r[0][0] for r in results]
+            mm           = [r[0][1] for r in results]
+
             # stops
             s0 = Stop(
                 vehicle    = vehicle,
-                end_time   = results[0][0]['start']['time'],
-                end_lon    = results[0][0]['start']['loc']['lon'],
-                end_lat    = results[0][0]['start']['loc']['lat'])
+                end_time   = trip_data[0]['start']['time'],
+                end_lon    = trip_data[0]['start']['loc']['lon'],
+                end_lat    = trip_data[0]['start']['loc']['lat'])
             sn = Stop(
                 vehicle    = vehicle,
-                start_time = results[-1][0]['end']['time'],
-                start_lon  = results[-1][0]['end']['loc']['lon'],
-                start_lat  = results[-1][0]['end']['loc']['lat'])
-            stops  = [s0] + [gen_stops(td1[0], td2[0], ns) for td1, td2, ns in zip(
-                results[:-1], results[1:], n_stationary[1:])] + [sn]
+                start_time = trip_data[-1]['end']['time'],
+                start_lon  = trip_data[-1]['end']['loc']['lon'],
+                start_lat  = trip_data[-1]['end']['loc']['lat'])
+            stops  = [s0] + [gen_stops(td1, td2, ns) for td1, td2, ns in zip(
+                trip_data[:-1], trip_data[1:], n_stationary[1:])] + [sn]
 
             # trips
             trips = [gen_trips(s1, s2) for s1, s2 in zip(
@@ -286,7 +280,7 @@ def _process_trips(rego, trips, seq_file_name, vehicle, base):
                 for t in gen_traversals(ms, ts, es)]
 
             write_to_db(vehicle, base, stops, trips, traversals)
-            json.dump([r[0] for r in results], seqfile)
+            json.dump(trip_data, seqfile)
 
     except Exception as e:
         logger.exception('processing {} failed...'.format(rego))
