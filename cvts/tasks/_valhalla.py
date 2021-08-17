@@ -7,6 +7,7 @@ from glob import glob
 from collections import defaultdict
 from multiprocessing import Pool
 from hashlib import sha256 as _hasher
+from functools import reduce
 import numpy as np
 import pandas as pd
 from sqlalchemy import create_engine
@@ -53,8 +54,13 @@ NA_VALUE = 'NA'
 POINT_KEYS = ('lat', 'lon', 'time', 'heading', 'speed', 'heading_tolerance')
 EDGE_KEYS = ('id', 'speed', 'speed_limit')
 EDGE_ATTR_NAMES = ('edge_id', 'valhalla_speed', 'speed_limit')
-MM_KEYS = POINT_KEYS + ('status', 'trip_index') + EDGE_ATTR_NAMES + ('edge_index', 'message')
+MM_KEYS = POINT_KEYS + \
+        ('status', 'trip_index') + \
+        EDGE_ATTR_NAMES + \
+        ('edge_index', 'message')
 NAS = (NA_VALUE,) * len(EDGE_KEYS)
+TRAVERSAL_KEYS = ('edge_id', 'edge_index', 'status', 'speed', 'time')
+TRAVERSAL_INDS = [MM_KEYS.index(k) for k in TRAVERSAL_KEYS]
 
 
 
@@ -114,28 +120,25 @@ def _init_db_connections():
     _session_maker = sessionmaker(bind=_engine)
     _init_mongo_db_connection()
 
-def write_to_db(vehicle, base, stops, trips, traversals):
+def write_to_db(vehicle, base, stops, trips, travs):
     global _session_maker
     session = _session_maker()
     session.add(vehicle)
     session.add(base)
-    for stop in stops:
-        session.add(stop)
-    for trip in trips:
-        session.add(trip)
-    for traversal in traversals:
-        session.add(traversal)
+    for stop in stops: session.add(stop)
+    for trip in trips: session.add(trip)
+    for trav in travs: session.add(trav)
     session.commit()
 
 
 
 def _average_speed(rego, results):
-    df = pd.DataFrame({k:v for k, v in zip(MM_KEYS, r)} for r in results)
+    df = pd.DataFrame({k:r[i] for k, i in zip(
+        TRAVERSAL_KEYS, TRAVERSAL_INDS)} for r in results)
     df.drop(df[(df.status == 'failure') | (df.edge_id == NA_VALUE)].index, inplace=True)
-    df.dropna(subset = ['edge_id'], inplace=True)
 
     if df.shape[0] == 0:
-        return None
+        return None, None
 
     df['edge_id'] = df['edge_id'].astype(np.uint64)
 
@@ -151,11 +154,31 @@ def _average_speed(rego, results):
     speed = df[df.speed > 6].groupby(
         ['edge_index']).apply(ave_speed).reset_index()
 
+    # missing edges and estimated times
+    def edge_times(i1, i2, t1, t2):
+        # TODO: consider if we want to take account of the edge lengths here.
+        d = int(i2 - i1)
+        if d < 2: return []
+        dfrac = 1. / float(d)
+        tdiff = float(t2 - t1)
+        return [(
+            int(i1 + i + 1),
+            int(t1 + (float(i)+1.) * dfrac * tdiff)) for i in range(d-1)]
+
+    eds = reduce(
+        lambda a, n: a + edge_times(*n),
+        zip(
+            df['edge_index'].iloc[ :-1],
+            df['edge_index'].iloc[1:  ],
+            df['time'].iloc[ :-1],
+            df['time'].iloc[1:  ]),
+        [])
+
     if len(speed) != 0:
         speed["rego"] = rego
-        return speed
+        return eds, speed
 
-    return None
+    return eds, None
 
 
 
@@ -183,10 +206,10 @@ def _process_trips(rego, trips, seq_file_name, vehicle, base):
 
             # convert the output from Valhalla into our outputs (seq files).
             edges = snapped['edges']
-            trip_data['geojson'] = json2geojson(snapped, True)
+            trip_data['geojson']        = json2geojson(snapped, True)
             trip_data['edge_to_osmids'] = [[e['id'], e['osmids']] for e in edges]
-            trip_data['way_ids'] = [e['way_id'] for e in edges]
-            trip_data['status'] = 'success'
+            trip_data['way_ids']        = [e['way_id'] for e in edges]
+            trip_data['status']         = 'success'
 
             match_props = ((p.get('edge_index'), p['type']) for p in snapped['matched_points'])
 
@@ -197,8 +220,11 @@ def _process_trips(rego, trips, seq_file_name, vehicle, base):
 
         except Exception as e:
             e_str = '{}: {}'.format(e.__class__.__name__, str(e))
-            trip_data['status'] = 'failure'
-            trip_data['message'] = e_str
+            trip_data['geojson']        = {}
+            trip_data['edge_to_osmids'] = []
+            trip_data['way_ids']        = []
+            trip_data['status']         = 'failure'
+            trip_data['message']        = e_str
             return trip_data, [_getpointattrs(p) + \
                 ('failure', trip_index) + \
                 NAS + \
@@ -207,7 +233,7 @@ def _process_trips(rego, trips, seq_file_name, vehicle, base):
     try:
         with open(seq_file_name , 'w') as seqfile:
 
-            def gen_stops(td1, td2, n_stationary):
+            def gen_stop(td1, td2, n_stationary):
                 start_ll = (
                     td1['end']['loc']['lon'],
                     td1['end']['loc']['lat'])
@@ -231,24 +257,33 @@ def _process_trips(rego, trips, seq_file_name, vehicle, base):
                     end_lon = end_ll[0],
                     end_lat = end_ll[1])
 
-            def gen_trips(stop1, stop2):
+            def gen_trip(stop1, stop2):
                 return Trip(
                     vehicle = vehicle,
                     start   = stop1,
                     end     = stop2)
 
-            def gen_traversals(result, trip):
-                speeds =  _average_speed(rego, result)
-                if speeds is None:
-                    return None
+            def gen_traversals(result, trip, edge_ids):
+                missing_inds_and_ts, speeds =  _average_speed(rego, result)
+                if speeds is not None:
+                    for index, line in speeds.iterrows():
+                        yield Traversal(
+                            vehicle = vehicle,
+                            trip    = trip,
+                            edge    = line['edge_id'],
+                            timestamp = line['timestamp'],
+                            speed   = line['speed'],
+                            count   = line['weight'])
 
-                return [Traversal(
-                    vehicle = vehicle,
-                    trip    = trip,
-                    edge    = line['edge_id'],
-                    timestamp = line['timestamp'],
-                    speed   = line['speed'],
-                    count   = line['weight']) for index, line in speeds.iterrows()]
+                if missing_inds_and_ts is not None:
+                    for index, time in missing_inds_and_ts:
+                        yield Traversal(
+                            vehicle = vehicle,
+                            trip    = trip,
+                            edge    = edge_ids[index],
+                            timestamp = time,
+                            speed   = None,
+                            count   = 1)
 
             results = [(run_trip(trip, ti), n_stationary) for \
                     ti, (n_stationary, trip) in enumerate(trips)]
@@ -256,6 +291,7 @@ def _process_trips(rego, trips, seq_file_name, vehicle, base):
             n_stationary = [r[1]    for r in results]
             trip_data    = [r[0][0] for r in results]
             mm           = [r[0][1] for r in results]
+            edge_ids     = [[e[0]   for e in td['edge_to_osmids']] for td in trip_data]
 
             # stops
             s0 = Stop(
@@ -268,11 +304,11 @@ def _process_trips(rego, trips, seq_file_name, vehicle, base):
                 start_time = trip_data[-1]['end']['time'],
                 start_lon  = trip_data[-1]['end']['loc']['lon'],
                 start_lat  = trip_data[-1]['end']['loc']['lat'])
-            stops  = [s0] + [gen_stops(td1, td2, ns) for td1, td2, ns in zip(
+            stops  = [s0] + [gen_stop(td1, td2, ns) for td1, td2, ns in zip(
                 trip_data[:-1], trip_data[1:], n_stationary[1:])] + [sn]
 
             # trips
-            trips = [gen_trips(s1, s2) for s1, s2 in zip(
+            trips = [gen_trip(s1, s2) for s1, s2 in zip(
                 stops[:-1], stops[1:])]
 
             # traversals
