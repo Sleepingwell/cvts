@@ -2,8 +2,10 @@
 
 from sqlalchemy import create_engine
 from cvts.settings import POSTGRES_CONNECTION_STRING
-from cvts.models import DBase
+from cvts.models import DBase, Vehicle, VehicleType
 
+models_to_keep = [m.__tablename__ for m in (Vehicle, VehicleType)]
+tables_to_drop = [t for n, t in DBase.metadata.tables.items() if n not in models_to_keep]
 engine = create_engine(POSTGRES_CONNECTION_STRING)
-DBase.metadata.drop_all(engine)
+DBase.metadata.drop_all(engine, tables=tables_to_drop)
 DBase.metadata.create_all(engine)
