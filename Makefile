@@ -33,6 +33,7 @@ venv: clean
 	rm -rf venv
 	virtualenv -p python3 venv
 	. ./venv/bin/activate && pip install -e .[dev]
+	. ./venv/bin/activate && pip install  -r ./doc/requirements-docs.txt
 
 sphinx-doc: clean-sphinx-doc
 	. ./venv/bin/activate \
