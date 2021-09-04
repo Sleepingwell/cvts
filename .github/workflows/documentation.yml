@@ -17,11 +17,7 @@ jobs:
       run: |
         sudo apt-get install doxygen
         python -m pip install setuptools --upgrade
-        python -m pip install -r requirements.txt
-
-    - name: Compile library
-      run: |
-        pip install -e .
+#        python -m pip install -r requirements.txt
 
     - name: Builds documentation
       run: |
