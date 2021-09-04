@@ -75,12 +75,15 @@ threads, it was possible to backup an entire month worth of data in less than 4h
 Extract, Load & Transform
 =========================
 
-
-Due to the volume of data and its organization, the data ingestion was divided into two phases:
+Due to the volume of data and its organization, and to allow for the leveraging of as many threads as available in
+our infrastructure the data ingestion was divided into two phases:
 
 1. Separation of the original data into one file per vehicle
 2. Consolidation of daily files into one file per vehicle per month
 
+During development, we verified that loading the Parquet files generated during the backup process is substantially
+faster than loading the original CSV files, and therefore we load the data from the backup rather than from the
+original CSV files.
 
 .. _datalake_database:
 Reference database
@@ -114,18 +117,19 @@ During this step of the process a new unique integer identifier is assigned to e
 are recorded, or their previously assigned identifier is retrieved from the database. During this step we also
 verify if a vehicle type has previously been assigned to each unique vehicle and update the vehicle type in the
 database whenever appropriate, as often the vehicle type available in large portions of the entries for each vehicle
-is the Vietnamese equivalent to "unclassified vehicle".1
+is the Vietnamese equivalent to "unclassified vehicle".
+
+The core process is implemented to process a single day of data and a wrapper function implements a loop to
+process every day in a month with a single call.
 
 .. _monthly_processing:
 Monthly data
 ------------
 
-* Sort the data
-* Populate the vehicle_days table
+The second and final process of data ingestion is the consolidation of the vehicle-day files into a file per month.
 
-.. _data_testing:
-Data testing
-------------
+It is also during this stage that the statistics that go into the vehicle_days table in the reference database are
+computed and the database populated.
 
-
+The process is implemented to consolidate one month per call, and it also includes tests on integrity.
 
