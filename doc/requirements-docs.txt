@@ -1,0 +1,4 @@
+Sphinx>=1.7.5
+sphinx_theme
+sphinx_autodoc_annotation
+nbsphinx

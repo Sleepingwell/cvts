@@ -15,15 +15,12 @@ jobs:
         python-version: 3.9
     - name: Install dependencies
       run: |
-        sudo apt-get install doxygen
         python -m pip install setuptools --upgrade
-#        python -m pip install -r requirements.txt
+        python -m pip install -r doc/requirements-docs.txt
 
     - name: Builds documentation
       run: |
         cd doc
-        doxygen doxygen.conf
-        ls
         sphinx-build -b html source build
 
     - name: Keeps documentation on GitHub
