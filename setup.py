@@ -10,7 +10,7 @@ setup(
     packages=find_packages(),
     scripts=[
         'bin/createpgdb',
-        'bin/json2geojson',
+        'bin/loadvehicles',
         'bin/processall',
         'bin/processtraces'],
     install_requires=[
