@@ -86,6 +86,7 @@ faster than loading the original CSV files, and therefore we load the data from 
 original CSV files.
 
 .. _datalake_database:
+
 Reference database
 ------------------
 
@@ -104,6 +105,7 @@ data to vehicles that operate during a certain period and region, as well as dis
 period too short or with too few GPS records to be deemed useful.
 
 .. _daily_processing:
+
 Separating traces per vehicle
 -----------------------------
 The first process in the ingestion of the raw data provided by HANEL is to separate all data in separate datafiles
@@ -123,6 +125,7 @@ The core process is implemented to process a single day of data and a wrapper fu
 process every day in a month with a single call.
 
 .. _monthly_processing:
+
 Monthly data
 ------------
 
