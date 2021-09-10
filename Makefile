@@ -33,6 +33,7 @@ venv: clean
 	rm -rf venv
 	virtualenv -p python3 venv
 	. ./venv/bin/activate && pip install -e .[dev]
+	. ./venv/bin/activate && pip install  -r ./doc/requirements-docs.txt
 
 sphinx-doc: clean-sphinx-doc
 	. ./venv/bin/activate \
@@ -45,12 +46,13 @@ sphinx-doc: clean-sphinx-doc
 	    && PYTHONPATH=$(CURDIR) sphinx-build -b html . ../build
 
 push-doc: sphinx-doc
-	if [ ! -d $(DOC_BUILD_DIR) ]; then git worktree add $(DOC_BUILD_DIR) gh-pages; fi
-	cp -r doc/build/* $(DOC_BUILD_DIR) && \
+	git fetch origin gh-pages
+	if [ ! -d $(DOC_BUILD_DIR) ]; then git worktree add $(DOC_BUILD_DIR) origin/gh-pages; fi
+	-cp -r doc/build/* $(DOC_BUILD_DIR) && \
 	    cd $(DOC_BUILD_DIR) && \
 	    git add -A && \
-	    git commit -m "Updates of Documenation."
-	git push -f origin gh-pages
+	    git commit -m "Updates of Documenation." && \
+	    git push origin HEAD:gh-pages
 	rm -rf $(DOC_BUILD_DIR)
 	git worktree prune
 

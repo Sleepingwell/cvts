@@ -3,13 +3,14 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-YDYR's Developer Documentation
+CVTS's Developer Documentation
 ==============================
 
 .. toctree::
    :maxdepth: 2
 
    cvts
+   etl
    config
    input
    output
